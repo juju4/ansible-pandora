@@ -6,6 +6,7 @@ pandora_pkgs:
   - apparmor-utils
   - acl
   - unzip
+  - pkg-config
   - python3-venv
   # for compiling things
   - python3-dev
