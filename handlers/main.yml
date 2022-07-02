@@ -1,25 +1,30 @@
 ---
-# handlers file for juju4.kvrocks
 
 - name: reload systemd
   ansible.builtin.systemd:
     daemon_reload: yes
   when: >
-    not (ansible_virtualization_type is defined and (ansible_virtualization_type == "docker"))
+    not (ansible_virtualization_type is defined and
+          (ansible_virtualization_type == "docker" or ansible_virtualization_type == "containerd")
+        )
 
 - name: restart kvrocks
-  ansible.builtin.systemd:
+  ansible.builtin.service:
     name: kvrocks
     state: restarted
   when: >
-    not (ansible_virtualization_type is defined and (ansible_virtualization_type == "docker"))
+    not (ansible_virtualization_type is defined and
+          (ansible_virtualization_type == "docker" or ansible_virtualization_type == "containerd")
+        )
 
 - name: restart pandora
-  ansible.builtin.systemd:
+  ansible.builtin.service:
     name: pandora
     state: restarted
   when: >
-    not (ansible_virtualization_type is defined and (ansible_virtualization_type == "docker"))
+    not (ansible_virtualization_type is defined and
+          (ansible_virtualization_type == "docker" or ansible_virtualization_type == "containerd")
+        )
 
 - name: Updating ClamAV Signatures  # noqa command-instead-of-module
   ansible.builtin.shell: systemctl stop clamav-freshclam.service; freshclam --quiet; systemctl start clamav-freshclam.service
