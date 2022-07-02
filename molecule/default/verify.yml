@@ -2,7 +2,7 @@
 
 - name: Verify
   hosts: pandora
-  gather_facts: false
+  gather_facts: true
   vars:
     pandora_start: /var/_pandora/pandora/bin/start.py
     binary_redis: /var/_pandora/redis/src/redis-server
