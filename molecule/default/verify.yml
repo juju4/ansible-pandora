@@ -4,12 +4,10 @@
   hosts: pandora
   gather_facts: false
   vars:
-    binaries:
-      - /var/_pandora/redis/src/redis-server
-      - /var/_pandora/kvrocks/src/kvrocks
-      - /var/_pandora/pandora/bin/start.py
-    config:
-      - /var/_pandora/pandora/config/generic.json
+    pandora_start: /var/_pandora/pandora/bin/start.py
+    binary_redis: /var/_pandora/redis/src/redis-server
+    binary_kvrocks: /var/_pandora/kvrocks/src/kvrocks
+    config: /var/_pandora/pandora/config/generic.json
     ports:
       - { h: localhost, p: 6101 }
       - { h: 0.0.0.0, p: 6100 }
@@ -22,25 +20,37 @@
       ansible.builtin.assert:
         that: ansible_facts.packages['libreoffice-base-nogui']
 
-    - name: Check pandora binary file
+    - name: Check pandora start file
       ansible.builtin.stat:
-        path: "{{ item }}"
+        path: "{{ pandora_start }}"
       register: bin1
-      loop: "{{ binaries }}"
-    - name: Validate pandora binaries are present
+    - name: Validate pandora start.py is present
       ansible.builtin.assert:
-        that: bin1[item].stat.exists and bin1[item].stat.size != 0 and bin1[item].stat.mode == '0755'
-      loop: "{{ binaries }}"
+        that: bin1.stat.exists and bin1.stat.size != 0 and bin1.stat.mode == '0755'
+
+    - name: Check redis file
+      ansible.builtin.stat:
+        path: "{{ binary_redis }}"
+      register: bin2
+    - name: Validate redis binary is present
+      ansible.builtin.assert:
+        that: bin2.stat.exists and bin2.stat.size != 0 and bin2.stat.mode == '0755'
+
+    - name: Check kvrocks file
+      ansible.builtin.stat:
+        path: "{{ binary_kvrocks }}"
+      register: bin3
+    - name: Validate kvrocks binary is present
+      ansible.builtin.assert:
+        that: bin3.stat.exists and bin3.stat.size != 0 and bin3.stat.mode == '0755'
 
     - name: Check pandora config file
       ansible.builtin.stat:
-        path: "{{ item }}"
+        path: "{{ config }}"
       register: cfg1
-      loop: "{{ config }}"
     - name: Validate pandora configuration files are present
       ansible.builtin.assert:
-        that: cfg1[item].stat.exists and cfg1[item].stat.size != 0
-      loop: "{{ config }}"
+        that: cfg1.stat.exists and cfg1.stat.size != 0
 
     - name: Ensure clamd socket is present
       ansible.builtin.stat:
@@ -93,3 +103,7 @@
       ansible.builtin.assert:
         that: >
           "'pandora' in web.content"
+      when: >
+        not (ansible_virtualization_type is defined and
+              (ansible_virtualization_type == "docker" or ansible_virtualization_type == "containerd")
+            )
