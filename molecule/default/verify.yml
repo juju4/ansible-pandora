@@ -26,7 +26,7 @@
       register: bin1
     - name: Validate pandora start.py is present
       ansible.builtin.assert:
-        that: bin1.stat.exists and bin1.stat.size != 0 and bin1.stat.mode == '0755'
+        that: bin1.stat.exists and bin1.stat.size != 0 and bin1.stat.mode == '0775'
 
     - name: Check redis file
       ansible.builtin.stat:
