@@ -85,6 +85,8 @@ jobs:
       - name: After script - systemd
         run: |
           systemctl -l --no-pager status pandora || true
+          systemctl -l --no-pager status clamav-freshclam || true
+          systemctl -l --no-pager status clamav-daemon || true
           systemd-analyze --no-pager security || true
           rsyslogd -v
         if: ${{ always() }}
@@ -104,9 +106,9 @@ jobs:
       - name: After script - misc
         run: |
           set -x
-          ls -la /var/run/clamav/clamd.ctl
-          ls -la /etc/apparmor.d/usr.lib.libreoffice*
-          sudo cat /etc/apparmor.d/usr.lib.libreoffice.program.soffice.bin
+          ls -la /var/run/clamav/clamd.ctl || true
+          ls -la /etc/apparmor.d/usr.lib.libreoffice* || true
+          sudo cat /etc/apparmor.d/usr.lib.libreoffice.program.soffice.bin || true
         if: ${{ always() }}
         continue-on-error: true
       - name: After script - curl
