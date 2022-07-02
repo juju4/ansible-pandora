@@ -36,6 +36,7 @@
     PATH: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:{{ poetry_root }}/bin"
   become: yes
   become_user: "{{ pandora_user }}"
+  become_flags: "-H"
   register: poetry_install
   changed_when: "'No dependencies to install or update' not in poetry_install.stdout"
 
