@@ -108,6 +108,6 @@ jobs:
         continue-on-error: true
       - name: After script - curl
         run: |
-          curl -v http://localhost:6100
+          curl -vL http://localhost:6100
         if: ${{ always() }}
         continue-on-error: true
