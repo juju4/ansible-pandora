@@ -1,0 +1,115 @@
+{{ ansible_managed | comment }}
+#
+# /etc/systemd/system/pandora.service
+# Exposure level 2.3
+#
+[Unit]
+Description=Pandora Analysis service
+Requires=network.target
+
+[Service]
+Type=forking
+# Type=simple
+# ExecStart=/bin/sh -c "{{ poetry_root }}/bin/poetry run update --yes"
+ExecStart=/bin/sh -c "{{ poetry_root }}/bin/poetry run start"
+ExecStop=/bin/sh -c "{{ poetry_root }}/bin/poetry run stop"
+WorkingDirectory={{ pandora_root }}/bin
+# Restart=always
+RestartSec=15
+SyslogIdentifier=pandora
+# (code=exited, status=209/STDOUT)
+# StandardOutput=append:/var/log/pandora/message.log
+# StandardError=append:/var/log/pandora/error.log
+User={{ pandora_user }}
+Group={{ pandora_user }}
+Environment=PATH=/usr/sbin:/usr/bin:/sbin:/bin:{{ poetry_root }}/bin
+
+# Reduce Attack Surface
+NoNewPrivileges=yes
+PrivateTmp=true
+ProtectHome=yes
+ProtectSystem=yes
+# ProtectSystem=strict
+{% if ansible_distribution == 'Ubuntu' and ansible_distribution_major_version|int >= 21 %}
+# ProtectProc=noaccess
+{% endif %}
+
+PrivateDevices=yes
+DeviceAllow=
+
+# PrivateUsers=yes
+
+UMask=077
+
+# ERROR: /proc not mounted - LibreOffice is unlikely to work well if at all
+# InaccessiblePaths=/proc
+
+ProtectKernelTunables=true
+ProtectKernelModules=yes
+{% if (ansible_distribution == 'Ubuntu' and ansible_distribution_major_version|int >= 20) or
+      (ansible_os_family == 'RedHat' and ansible_distribution_major_version|int > 8 )
+%}
+ProtectKernelLogs=yes
+ProtectHostname=yes
+ProtectClock=yes
+{% endif %}
+
+ProtectControlGroups=true
+LockPersonality=true
+RestrictRealtime=true
+RestrictNamespaces=yes
+RestrictNamespaces=~CLONE_NEWCGROUP CLONE_NEWIPC CLONE_NEWNET CLONE_NEWPID
+RestrictSUIDSGID=yes
+MemoryDenyWriteExecute=yes
+
+# PrivateNetwork=yes
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+
+IPAccounting=yes
+# IPAddressAllow=localhost link-local multicast 10.0.0.0/8 192.168.0.0/16
+
+CapabilityBoundingSet=~CAP_AUDIT_CONTROL CAP_AUDIT_READ CAP_DAC_READ_SEARCH
+CapabilityBoundingSet=~CAP_SYS_RAWIO
+CapabilityBoundingSet=~CAP_SYS_PTRACE
+CapabilityBoundingSet=~CAP_DAC_* CAP_FOWNER CAP_IPC_OWNER
+CapabilityBoundingSet=~CAP_NET_ADMIN
+CapabilityBoundingSet=~CAP_KILL
+CapabilityBoundingSet=~CAP_NET_BIND_SERVICE CAP_NET_BROADCAST
+CapabilityBoundingSet=~CAP_SYS_NICE CAP_SYS_RESOURCE
+CapabilityBoundingSet=~CAP_SYS_BOOT
+CapabilityBoundingSet=~CAP_LINUX_IMMUTABLE
+CapabilityBoundingSet=~CAP_SYS_CHROOT
+CapabilityBoundingSet=~CAP_BLOCK_SUSPEND
+CapabilityBoundingSet=~CAP_LEASE
+CapabilityBoundingSet=~CAP_SYS_PACCT
+CapabilityBoundingSet=~CAP_SYS_TTY_CONFIG
+CapabilityBoundingSet=~CAP_SYS_ADMIN
+CapabilityBoundingSet=~CAP_SETUID CAP_SETGID
+CapabilityBoundingSet=~CAP_SETPCAP
+CapabilityBoundingSet=~CAP_CHOWN
+CapabilityBoundingSet=~CAP_FSETID CAP_SETFCAP
+CapabilityBoundingSet=~CAP_NET_RAW
+CapabilityBoundingSet=~CAP_IPC_LOCK
+
+{% if not (ansible_virtualization_type is defined and
+          ansible_virtualization_type == "docker"
+        )
+%}
+{% if (ansible_os_family == 'RedHat' and ansible_distribution_major_version|int >= 8) or (ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int > 18) %}
+SystemCallFilter=@system-service
+{% endif %}
+# SystemCallFilter=~@debug @mount @cpu-emulation @obsolete @privileged @resources @reboot @swap @raw-io @module
+SystemCallFilter=~@debug @mount @cpu-emulation @obsolete @resources @reboot @swap @raw-io @module
+# When system call is disallowed, return error code instead of killing process
+SystemCallErrorNumber=EPERM
+{% endif %}
+SystemCallArchitectures=native
+
+{% if pandora_cgroups_restriction_enable|bool %}
+CPUShares={{ pandora_cgroups_cpushares | default('1024') }}
+CPUQuota={{ pandora_cgroups_cpuquota | default('80%') }}
+MemoryLimit={{ pandora_cgroups_memorylimit | default('4G') }}
+{% endif %}
+
+[Install]
+WantedBy=multi-user.target

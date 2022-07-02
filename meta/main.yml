@@ -1,0 +1,17 @@
+---
+galaxy_info:
+  author: juju4
+  role_name: pandora
+  description: Setup pandora server, an analysis framework to discover if a file is suspicious and conveniently show the results.
+  license: BSD
+  min_ansible_version: '2.12'
+  platforms:
+    - name: Ubuntu
+      versions:
+        - jammy
+        - focal
+  galaxy_tags:
+    - security
+    - sandbox
+    - analysis
+dependencies: []

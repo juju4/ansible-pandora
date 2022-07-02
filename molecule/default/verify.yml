@@ -1,0 +1,95 @@
+---
+
+- name: Verify
+  hosts: pandora
+  gather_facts: false
+  vars:
+    binaries:
+      - /var/_pandora/redis/redis
+      - /var/_pandora/kvrocks/kvrocks
+      - /var/_pandora/pandora/bin/start.py
+    config:
+      - /var/_pandora/pandora/config/generic.json
+    ports:
+      - { h: localhost, p: 6101 }
+      - { h: 0.0.0.0, p: 6100 }
+    url: http://localhost:6100
+  tasks:
+    - name: Gather package facts
+      ansible.builtin.package_facts:
+        manager: auto
+    - name: Validate that needed packages are present
+      ansible.builtin.assert:
+        that: ansible_facts.packages['libreoffice']
+
+    - name: Check pandora binary file
+      ansible.builtin.stat:
+        path: "{{ item }}"
+      register: bin1
+      loop: "{{ binaries }}"
+    - name: Validate pandora binaries are present
+      ansible.builtin.assert:
+        that: bin1[item].stat.exists and bin1[item].stat.size != 0 and bin1[item].stat.mode == '0755'
+      loop: "{{ binaries }}"
+
+    - name: Check pandora config file
+      ansible.builtin.stat:
+        path: "{{ item }}"
+      register: cfg1
+      loop: "{{ config }}"
+    - name: Validate pandora configuration files are present
+      ansible.builtin.assert:
+        that: cfg1[item].stat.exists and cfg1[item].stat.size != 0
+      loop: "{{ config }}"
+
+    - name: Ensure clamd socket is present
+      ansible.builtin.stat:
+        path: /var/run/clamav/clamd.ctl
+      register: ctl
+    - name: Validate clamd socket present
+      ansible.builtin.assert:
+        that: ctl.stat.exists and ctl.stat.issock
+      failed_when: false
+
+    - name: Ensure mongod process is running
+      ansible.builtin.command: pgrep -u _fact mongod
+      register: ps3
+      changed_when: false
+      failed_when: false
+    - name: Validate ps output
+      ansible.builtin.assert:
+        that: ps3.stdout
+      when: >
+        not (ansible_virtualization_type is defined and
+              (ansible_virtualization_type == "docker" or ansible_virtualization_type == "containerd")
+            )
+
+    - name: check all processes
+      ansible.builtin.command: ps aux
+      changed_when: false
+      register: psa
+    - name: Debug | ps aux output
+      ansible.builtin.debug: var=psa verbosity=1
+
+    - name: Ensure ports are listening
+      ansible.builtin.wait_for:
+        host: "{{ item.h }}"
+        port: "{{ item.p }}"
+        timeout: 10
+      with_items: "{{ ports }}"
+      when: >
+        not (ansible_virtualization_type is defined and
+              (ansible_virtualization_type == "docker" or ansible_virtualization_type == "containerd")
+            )
+
+    - name: Fetch localhost endpoint
+      ansible.builtin.uri:
+        url: "{{ url }}"
+        validate_certs: no
+        return_content: yes
+      register: web
+      failed_when: false
+    - name: Validate localhost endpoint
+      ansible.builtin.assert:
+        that: >
+          "'pandora' in web.content"

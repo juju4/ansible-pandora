@@ -1,0 +1,38 @@
+---
+
+- name: Ensure systemd is present
+  ansible.builtin.package:
+    name: systemd
+    state: present
+
+- name: Ensure override folder exists
+  ansible.builtin.file:
+    dest: /etc/systemd/system/kvrocks.service.d
+    state: directory
+    mode: '0755'
+  when: false
+
+- name: Review kvrocks systemd options
+  ansible.builtin.template:
+    src: systemd-override-kvrocks.conf.j2
+    dest: /etc/systemd/system/kvrocks.service.d/hardening.conf
+    mode: '0644'
+  notify:
+    - reload systemd
+    - restart kvrocks
+  when: false
+
+- name: Configure pandora systemd unit
+  ansible.builtin.template:
+    src: systemd-pandora.service.j2
+    dest: /etc/systemd/system/pandora.service
+    mode: '0644'
+  notify:
+    - reload systemd
+    - restart pandora
+
+- name: Enable and start pandora service
+  ansible.builtin.service:
+    name: pandora
+    state: started
+    enabled: yes

@@ -1,0 +1,32 @@
+---
+# https://python-poetry.org/docs/
+
+- name: Ensure python3 and pip3 are present
+  ansible.builtin.package:
+    name:
+      - python3
+      - python3-pip
+    state: present
+
+- name: Download install-poetry.py
+  ansible.builtin.get_url:
+    url: https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py
+    dest: "{{ install_archives }}/install-poetry.py"
+    mode: '0755'
+    checksum: 'sha256:5c812616fb08ce8d72905ea24dd1a9be1f38717408377a8656efc4b5648c93cb'
+
+- name: Execute install-poetry.py
+  ansible.builtin.command: "python3 {{ install_archives }}/install-poetry.py"
+  environment:
+    POETRY_HOME: "{{ poetry_root }}"
+  # become: yes
+  # become_user: "{{ poetry_user }}"
+  args:
+    creates: "{{ poetry_root }}/bin/poetry"
+
+- name: Add poetry bash completions
+  ansible.builtin.shell: poetry completions bash > /etc/bash_completion.d/poetry.bash-completion
+  environment:
+    PATH: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:{{ poetry_root }}/bin"
+  args:
+    creates: /etc/bash_completion.d/poetry.bash-completion

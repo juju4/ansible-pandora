@@ -1,0 +1,11 @@
+---
+
+- name: Ensure pandora path allowed for libreoffice
+  ansible.builtin.lineinfile:
+    path: /etc/apparmor.d/usr.lib.libreoffice.program.soffice.bin
+    line: '  owner @{HOME}/pandora/tasks/** rwk,'
+    insertafter: '^profile libreoffice-soffice /usr/lib/libreoffice/program/soffice.bin .*{'
+    mode: '0644'
+    backup: "{{ pandora_backup }}"
+  notify:
+    - refresh apparmor libreoffice

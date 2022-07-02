@@ -1,0 +1,22 @@
+---
+
+- name: Download Comodo AV
+  ansible.builtin.get_url:
+    url: https://download.comodo.com/cis/download/installs/linux/cav-linux_x64.deb
+    dest: "{{ install_archives }}/cav-linux_x64.deb"
+    mode: '0644'
+    checksum: 'sha256:325b819b041a7b27026ba85f66ea808d0d11ad39d94bc13ae6d95802413495b6.'
+
+# this breaks apt further calls as broken dependencies
+- name: Install Comodo AV
+  ansible.builtin.command: "dpkg --ignore-depends=libssl0.9.8 -i {{ install_archives }}/cav-linux_x64.deb"
+  args:
+    creates: /var/lib/dpkg/info/cav-linux.list
+  when: false
+
+- name: Comodo signatures updates
+  ansible.builtin.get_url:
+    url: http://cdn.download.comodo.com/av/updates58/sigs/bases/bases.cav
+    dest: /opt/COMODO/scanners/bases.cav
+    mode: '0644'
+  when: false

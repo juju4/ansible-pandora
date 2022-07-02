@@ -1,0 +1,48 @@
+---
+
+- name: Include version-specific variables for Ubuntu.
+  ansible.builtin.include_vars: "{{ ansible_distribution }}-{{ ansible_distribution_version }}.yml"
+  when: ansible_distribution == 'Ubuntu'
+
+- name: Ensure archives folder exists
+  ansible.builtin.file:
+    dest: "{{ install_archives }}"
+    state: directory
+    mode: '0755'
+
+- name: Ensure dependencies packages are present
+  ansible.builtin.package:
+    name: "{{ pandora_pkgs }}"
+    state: present
+  notify:
+    - Updating ClamAV Signatures
+
+- name: Ensure / mounted with flag acl for ansible become unprivileged user
+  ansible.posix.mount:
+    src: "{{ item.src }}"
+    path: "{{ item.path }}"
+    fstype: "{{ item.fstype }}"
+    opts: "{{ item.opts }}"
+    state: "{{ item.state }}"
+  loop: "{{ pandora_fstab }}"
+  when: >
+    not (ansible_virtualization_type is defined and
+    (ansible_virtualization_type == "docker" or ansible_virtualization_type == "containerd")
+    )
+
+- import_tasks: poetry.yml
+  vars:
+    poetry_user: "{{ pandora_user }}"
+
+- import_tasks: redis-source.yml
+- import_tasks: kvrocks-source.yml
+- import_tasks: pandora.yml
+- import_tasks: av-workers.yml
+- import_tasks: workers.yml
+- import_tasks: apparmor.yml
+
+- import_tasks: systemd.yml
+  when: >
+    not (ansible_virtualization_type is defined and
+          (ansible_virtualization_type == "docker" or ansible_virtualization_type == "containerd")
+    )

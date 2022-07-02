@@ -1,0 +1,21 @@
+{{ ansible_managed | comment }}
+## /etc/logrotate.d/pandora
+
+/var/log/pandora/*.log {
+    rotate {{ pandora_logrotate_rotate|int }}
+    {{ pandora_logrotate_period }}
+{% if pandora_logrotate_datext %}
+        dateext
+        dateformat {{ pandora_logrotate_datformat }}
+{% endif%}
+    missingok
+    notifempty
+{% if pandora_logrotate_compress %}
+        compress
+        delaycompress
+{% endif %}
+	missingok
+	notifempty
+	copytruncate
+	create 0640 _pandora root
+}

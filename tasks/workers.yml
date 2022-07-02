@@ -1,0 +1,29 @@
+---
+
+- name: Configure workers
+  ansible.builtin.copy:
+    src: "{{ pandora_root }}/pandora/workers/{{ item }}.sample"
+    dest: "{{ pandora_root }}/pandora/workers/{{ item }}"
+    mode: '0644'
+    force: no
+    remote_src: yes
+  loop:
+    - base.yml
+    - extractor.yml
+    - joesandbox.yml
+    - observables.yml
+    - xmldeobfuscator.yml
+    - blocklists.yml
+    - hashlookup.yml
+    - malwarebazaar.yml
+    - ole.yml
+    - yara.yml
+    - clamav.yml
+    - hybridanalysis.yml
+    - msodde.yml
+    - preview.yml
+    - yara_signature_base.yml
+    - comodo.yml
+    - irma.yml
+    - mwdb.yml
+    - virustotal.yml

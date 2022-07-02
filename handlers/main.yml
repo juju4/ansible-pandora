@@ -1,0 +1,30 @@
+---
+# handlers file for juju4.kvrocks
+
+- name: reload systemd
+  ansible.builtin.systemd:
+    daemon_reload: yes
+  when: >
+    not (ansible_virtualization_type is defined and (ansible_virtualization_type == "docker"))
+
+- name: restart kvrocks
+  ansible.builtin.systemd:
+    name: kvrocks
+    state: restarted
+  when: >
+    not (ansible_virtualization_type is defined and (ansible_virtualization_type == "docker"))
+
+- name: restart pandora
+  ansible.builtin.systemd:
+    name: pandora
+    state: restarted
+  when: >
+    not (ansible_virtualization_type is defined and (ansible_virtualization_type == "docker"))
+
+- name: Updating ClamAV Signatures  # noqa command-instead-of-module
+  ansible.builtin.shell: systemctl stop clamav-freshclam.service; freshclam --quiet; systemctl start clamav-freshclam.service
+  async: 600
+  poll: 15
+
+- name: refresh apparmor libreoffice
+  ansible.builtin.command: aa-enforce /etc/apparmor.d/usr.lib.libreoffice*

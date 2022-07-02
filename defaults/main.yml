@@ -1,0 +1,43 @@
+---
+
+pandora_version: c3770856ed4849e6491b796f700598d2972d3ffa
+pandora_user: _pandora
+pandora_home: /var/_pandora
+pandora_root: "{{ pandora_home }}/pandora"
+poetry_root: /usr/local/share/poetry
+
+pandora_listen_ip: 0.0.0.0
+pandora_listen_port: 6100
+pandora_public_url: "http://0.0.0.0:6100"
+pandora_lookyloo_url: ""
+
+pandora_cgroups_restriction_enable: true
+
+# workers settings
+# pandora_hybridanalysis_apikey: 'null'
+# pandora_joesandbox_apikey: 'null'
+# pandora_malwarebazaar_apikey: 'null'
+# pandora_mwdb_apikey: 'null'
+# pandora_virustotal_apikey: 'null'
+
+# this must match https://github.com/pandora-analysis/pandora/blob/main/website/web/sri.txt
+# dropzone directly in pandora.yml
+pandora_dropzone_version: v6.0.0-beta.1
+pandora_web_static:
+  - { u: 'https://code.jquery.com/jquery-3.6.0.min.js', d: 'js/lib/jquery.min.js', c: 'sha256:ff1523fb7389539c84c65aba19260648793bb4f5e29329d2ee8804bc37a3fe6e' }
+  - { u: 'https://momentjs.com/downloads/moment-with-locales.min.js', d: 'js/lib/moment-with-locales.min.js', c: 'sha256:ed61b54e58ee4777799b9a8aa93d2d73874d0d1fda699b637364efd42fdce7ff' }
+
+install_archives: /var/_install
+# needed ansible Unprivileged become user
+pandora_fstab: []
+#  - { src: LABEL=SOME_LABEL, path: /, fstype: ext4, opts: "defaults,acl", state: remounted }
+
+# should file changes backup file before (replace, lineinfile...)
+pandora_backup: false
+
+pandora_logrotate_period: 'daily'
+pandora_logrotate_rotate: 90
+pandora_logrotate_compress: true
+pandora_logrotate_delaycompress: true
+pandora_logrotate_datext: true
+pandora_logrotate_datformat: '-%Y%m%d'

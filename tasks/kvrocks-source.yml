@@ -1,0 +1,32 @@
+---
+
+- name: Source kvrocks dependencies
+  ansible.builtin.apt:
+    name:
+      - gcc
+      - g++
+      - make
+      - libsnappy-dev
+      - autoconf
+      - automake
+      - libtool
+      - googletest
+      - libgtest-dev
+    state: present
+
+
+- name: clone kvrocks repository
+  ansible.builtin.git:
+    repo: https://github.com/apache/incubator-kvrocks.git
+    dest: "{{ pandora_home }}/kvrocks"
+    version: 2.0
+# become: yes
+# become_user: "{{ pandora_user }}"
+
+- name: build kvrocks
+  ansible.builtin.command: make -j4
+  args:
+    chdir: "{{ pandora_home }}/kvrocks"
+    creates: "{{ pandora_home }}/kvrocks/src/kvrocks"
+# become: yes
+# become_user: "{{ pandora_user }}"

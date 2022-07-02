@@ -1,0 +1,43 @@
+---
+
+pandora_pkgs:
+  - git
+  - python3
+  - apparmor-utils
+  - acl
+  - unzip
+  # for compiling things
+  - python3-dev
+  # For HTML -> PDF
+  - libpango-1.0-0
+  - libharfbuzz0b
+  - libpangoft2-1.0-0
+  # For Office -> PDF
+  - libreoffice-base-nogui
+  - libreoffice-calc-nogui
+  - libreoffice-draw-nogui
+  - libreoffice-impress-nogui
+  - libreoffice-math-nogui
+  - libreoffice-writer-nogui
+  # for extracting exif information
+  - exiftool
+  # for extracting rar files
+  - unrar
+  # for textract
+  - libxml2-dev
+  - libxslt1-dev
+  - antiword
+  - unrtf
+  - poppler-utils
+  - pstotext
+  - tesseract-ocr
+  - flac
+  - ffmpeg
+  - lame
+  - libmad0
+  - libsox-fmt-mp3
+  - sox
+  - libjpeg-dev
+  - swig
+  # AV workers
+  - clamav-daemon
