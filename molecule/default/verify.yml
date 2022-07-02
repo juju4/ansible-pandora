@@ -51,8 +51,8 @@
         that: ctl.stat.exists and ctl.stat.issock
       failed_when: false
 
-    - name: Ensure mongod process is running
-      ansible.builtin.command: pgrep -u _fact mongod
+    - name: Ensure pandora processes are running
+      ansible.builtin.command: pgrep -u _pandora python
       register: ps3
       changed_when: false
       failed_when: false

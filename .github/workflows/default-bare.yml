@@ -91,11 +91,23 @@ jobs:
         continue-on-error: true
       - name: After script - files
         run: |
+          set -x
           sudo ls -la /var/_pandora/
+          sudo cat /var/_pandora/pandora/config/generic.json
         if: ${{ always() }}
         continue-on-error: true
       - name: After script - logs
         run: |
           sudo tail -200 /var/log/syslog
+        if: ${{ always() }}
+        continue-on-error: true
+      - name: After script - misc
+        run: |
+          ls -la /var/run/clamav/clamd.ctl
+        if: ${{ always() }}
+        continue-on-error: true
+      - name: After script - curl
+        run: |
+          curl -v http://localhost:6100
         if: ${{ always() }}
         continue-on-error: true
