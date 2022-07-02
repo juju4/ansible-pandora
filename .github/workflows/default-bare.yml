@@ -99,6 +99,7 @@ jobs:
           sudo ls -la /var/_pandora/redis
           sudo ls -la /var/_pandora/pandora
           sudo cat /var/_pandora/pandora/config/generic.json
+          sudo ls -la /var/_pandora/kvrocks/src/kvrocks /var/_pandora/redis/src/redis-server || true
         if: ${{ always() }}
         continue-on-error: true
       - name: After script - logs
