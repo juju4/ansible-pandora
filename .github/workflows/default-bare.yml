@@ -103,7 +103,10 @@ jobs:
         continue-on-error: true
       - name: After script - misc
         run: |
+          set -x
           ls -la /var/run/clamav/clamd.ctl
+          ls -la /etc/apparmor.d/usr.lib.libreoffice*
+          sudo cat /etc/apparmor.d/usr.lib.libreoffice.program.soffice.bin
         if: ${{ always() }}
         continue-on-error: true
       - name: After script - curl
