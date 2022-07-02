@@ -12,6 +12,9 @@
       - { h: localhost, p: 6101 }
       - { h: 0.0.0.0, p: 6100 }
     url: http://localhost:6100
+  pre_tasks:
+    - name: Debug | var ansible_virtualization_type
+      ansible.builtin.debug: var=ansible_virtualization_type
   tasks:
     - name: Gather package facts
       ansible.builtin.package_facts:
