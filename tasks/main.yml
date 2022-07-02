@@ -10,6 +10,13 @@
     state: directory
     mode: '0755'
 
+- name: Debian | Update cache
+  ansible.builtin.apt:
+    update_cache: yes
+    cache_valid_time: "{{ pandora_apt_cache_valid_time | default('3600') }}"
+  become: yes
+  when: ansible_os_family == 'Debian'
+
 - name: Ensure dependencies packages are present
   ansible.builtin.package:
     name: "{{ pandora_pkgs }}"
