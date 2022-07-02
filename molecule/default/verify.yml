@@ -5,8 +5,8 @@
   gather_facts: false
   vars:
     binaries:
-      - /var/_pandora/redis/redis
-      - /var/_pandora/kvrocks/kvrocks
+      - /var/_pandora/redis/src/redis-server
+      - /var/_pandora/kvrocks/src/kvrocks
       - /var/_pandora/pandora/bin/start.py
     config:
       - /var/_pandora/pandora/config/generic.json
