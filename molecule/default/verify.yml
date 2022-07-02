@@ -20,7 +20,7 @@
         manager: auto
     - name: Validate that needed packages are present
       ansible.builtin.assert:
-        that: ansible_facts.packages['libreoffice']
+        that: ansible_facts.packages['libreoffice-base-nogui']
 
     - name: Check pandora binary file
       ansible.builtin.stat:
