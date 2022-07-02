@@ -10,10 +10,10 @@
 
 - name: Download install-poetry.py
   ansible.builtin.get_url:
-    url: https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py
+    url: https://install.python-poetry.org
     dest: "{{ install_archives }}/install-poetry.py"
     mode: '0755'
-    checksum: 'sha256:5c812616fb08ce8d72905ea24dd1a9be1f38717408377a8656efc4b5648c93cb'
+    checksum: "{{ pandora_poetry_hash }}"
 
 - name: Execute install-poetry.py
   ansible.builtin.command: "python3 {{ install_archives }}/install-poetry.py"
