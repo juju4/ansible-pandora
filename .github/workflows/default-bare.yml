@@ -95,6 +95,9 @@ jobs:
         run: |
           set -x
           sudo ls -la /var/_pandora/
+          sudo ls -la /var/_pandora/kvrocks
+          sudo ls -la /var/_pandora/redis
+          sudo ls -la /var/_pandora/pandora
           sudo cat /var/_pandora/pandora/config/generic.json
         if: ${{ always() }}
         continue-on-error: true
@@ -106,7 +109,8 @@ jobs:
       - name: After script - misc
         run: |
           set -x
-          ls -la /var/run/clamav/clamd.ctl || true
+          sudo ls -la /var/lib/clamav/ || true
+          sudo ls -la /var/run/clamav/clamd.ctl || true
           ls -la /etc/apparmor.d/usr.lib.libreoffice* || true
           sudo cat /etc/apparmor.d/usr.lib.libreoffice.program.soffice.bin || true
         if: ${{ always() }}
