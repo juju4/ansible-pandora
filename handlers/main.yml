@@ -30,6 +30,10 @@
   ansible.builtin.shell: systemctl stop clamav-freshclam.service; freshclam --quiet; systemctl start clamav-freshclam.service
   async: 600
   poll: 15
+  when: >
+    not (ansible_virtualization_type is defined and
+          (ansible_virtualization_type == "docker" or ansible_virtualization_type == "containerd")
+        )
 
 - name: refresh apparmor libreoffice
   ansible.builtin.command: aa-enforce /etc/apparmor.d/usr.lib.libreoffice*
