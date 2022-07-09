@@ -12,16 +12,6 @@
   become: yes
   become_user: root
 
-- name: Grant user poetry access to archives
-  ansible.posix.acl:
-    path: "{{ install_archives }}"
-    entity: "{{ pandora_user }}"
-    etype: user
-    permissions: rwx
-    state: present
-  become: yes
-  become_user: root
-
 - name: Debian | Update cache
   ansible.builtin.apt:
     update_cache: yes
@@ -68,6 +58,16 @@
     owner: "{{ pandora_user }}"
     mode: '0755'
     state: directory
+  become: yes
+  become_user: root
+
+- name: Grant user poetry access to archives
+  ansible.posix.acl:
+    path: "{{ install_archives }}"
+    entity: "{{ pandora_user }}"
+    etype: user
+    permissions: rwx
+    state: present
   become: yes
   become_user: root
 
