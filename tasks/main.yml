@@ -99,7 +99,11 @@
 - import_tasks: firewall-ufw.yml
   become: yes
   become_user: root
-  when: pandora_ufw|bool
+  when:
+    - pandora_ufw|bool
+    - not (ansible_virtualization_type is defined and
+          (ansible_virtualization_type == "docker" or ansible_virtualization_type == "containerd")
+        )
 
 - import_tasks: systemd.yml
   become: yes
