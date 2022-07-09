@@ -24,9 +24,10 @@ pandora_cgroups_restriction_enable: true
 # this must match https://github.com/pandora-analysis/pandora/blob/main/website/web/sri.txt
 # dropzone directly in pandora.yml
 pandora_dropzone_version: v6.0.0-beta.1
+pandora_moment_version: 2.29.3
+pandora_moment_checksum: 'sha256:8240b88c4879b771bdc2ab571fe26d8c10dc92f0e1c130ae468a01ef8d57fe52'
 pandora_web_static:
   - { u: 'https://code.jquery.com/jquery-3.6.0.min.js', d: 'js/lib/jquery.min.js', c: 'sha256:ff1523fb7389539c84c65aba19260648793bb4f5e29329d2ee8804bc37a3fe6e' }
-  - { u: 'https://momentjs.com/downloads/moment-with-locales.min.js', d: 'js/lib/moment-with-locales.min.js', c: 'sha256:ed61b54e58ee4777799b9a8aa93d2d73874d0d1fda699b637364efd42fdce7ff' }
 
 install_archives: /var/_install
 # needed ansible Unprivileged become user

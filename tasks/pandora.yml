@@ -111,7 +111,21 @@
     mode: '0600'
     remote_src: true
 
-- name: Set dropzone files in web root
+- name: Download moment dist
+  ansible.builtin.get_url:
+    url: "https://github.com/moment/moment/archive/refs/tags/{{ pandora_moment_version }}.tar.gz"
+    dest: "{{ pandora_home }}/moment.tar.gz"
+    mode: '0600'
+    checksum: "{{ pandora_moment_checksum }}"
+
+- name: Unarchive moment dist
+  ansible.builtin.unarchive:
+    src: "{{ pandora_home }}/moment.tar.gz"
+    dest: "{{ pandora_home }}"
+    mode: '0700'
+    remote_src: true
+
+- name: Set dropzone and moment files in web root
   ansible.builtin.copy:
     src: "{{ pandora_home }}/{{ item.s }}"
     dest: "{{ pandora_root }}/website/web/static/{{ item.d }}"
@@ -121,3 +135,4 @@
   loop:
     - { s: dist/dropzone-min.js, d: js/lib/dropzone-min.js }
     - { s: dist/dropzone.css, d: css/lib/dropzone.css }
+    - { s: "moment-{{ pandora_moment_version }}/min/moment-with-locales.min.js", d: js/lib/moment-with-locales.min.js }
