@@ -7,6 +7,8 @@
       - python3
       - python3-pip
     state: present
+  register: pkg_result
+  until: pkg_result is success
   become: yes
   become_user: root
 
@@ -16,6 +18,8 @@
     dest: "{{ install_archives }}/install-poetry.py"
     mode: '0755'
     checksum: "{{ pandora_poetry_hash }}"
+  register: dl_result
+  until: dl_result is success
   become: yes
   become_user: "{{ pandora_user }}"
 

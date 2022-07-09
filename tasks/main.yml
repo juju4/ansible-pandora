@@ -26,6 +26,8 @@
     state: present
   become: yes
   become_user: root
+  register: pkg_result
+  until: pkg_result is success
   notify:
     - Updating ClamAV Signatures
 

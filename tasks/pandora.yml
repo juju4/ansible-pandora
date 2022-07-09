@@ -78,6 +78,8 @@
     mode: '0644'
     checksum: "{{ item.c }}"
   loop: "{{ pandora_web_static }}"
+  register: dl_result
+  until: dl_result is success
 
 - name: Download dropzone dist
   ansible.builtin.get_url:
@@ -85,6 +87,8 @@
     dest: "{{ pandora_home }}/dropzone-dist.zip"
     mode: '0600'
     checksum: "sha256:4b0100a34ee5751ca147ab6f7964a822b212554807676cf44dba6b6e29ab9ba5"
+  register: dl_result
+  until: dl_result is success
 
 - name: Unarchive dropzone dist
   ansible.builtin.unarchive:

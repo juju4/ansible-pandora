@@ -6,6 +6,8 @@
     dest: "{{ install_archives }}/cav-linux_x64.deb"
     mode: '0644'
     checksum: 'sha256:325b819b041a7b27026ba85f66ea808d0d11ad39d94bc13ae6d95802413495b6.'
+  register: dl_result
+  until: dl_result is success
 
 # this breaks apt further calls as broken dependencies
 - name: Install Comodo AV
@@ -19,4 +21,6 @@
     url: http://cdn.download.comodo.com/av/updates58/sigs/bases/bases.cav
     dest: /opt/COMODO/scanners/bases.cav
     mode: '0644'
+  register: dl_result
+  until: dl_result is success
   when: false
