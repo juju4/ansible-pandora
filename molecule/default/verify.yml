@@ -37,7 +37,7 @@
       register: bin2
     - name: Validate redis binary is present
       ansible.builtin.assert:
-        that: bin2.stat.exists and bin2.stat.size != 0 and bin2.stat.mode == '0755'
+        that: bin2.stat.exists and bin2.stat.size != 0 and bin2.stat.mode == '0775'
 
     - name: Check kvrocks file
       ansible.builtin.stat:
@@ -45,7 +45,7 @@
       register: bin3
     - name: Validate kvrocks binary is present
       ansible.builtin.assert:
-        that: bin3.stat.exists and bin3.stat.size != 0 and bin3.stat.mode == '0755'
+        that: bin3.stat.exists and bin3.stat.size != 0 and bin3.stat.mode == '0775'
 
     - name: Check pandora config file
       ansible.builtin.stat:
