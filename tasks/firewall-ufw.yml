@@ -3,33 +3,33 @@
 # - include: logging.yml
 
 - name: install ufw
-  package: name=ufw state=present
+  ansible.builtin.package: name=ufw state=present
   register: pkg_result
   until: pkg_result is success
 
 - name: ufw | RedHat | ensure enabled
-  ufw: state=enabled
+  community.general.ufw: state=enabled
   when: ansible_os_family == 'RedHat'
 
 - name: ufw | ensure logging medium is enabled
-  ufw: logging={{ pandora_ufw_default_logging }}
+  community.general.ufw: logging={{ pandora_ufw_default_logging }}
 
 - name: ufw | always allow ssh
-  ufw:
+  community.general.ufw:
     rule: allow
     name: "{{ ufw_rulename_ssh }}"
     log: yes
 
 - name: ufw | allow access from defined networks
-  ufw: rule=allow src={{ item }}
+  community.general.ufw: rule=allow src={{ item }}
   with_items: "{{ pandora_ufw_access }}"
 
 - name: ufw | allow access from defined networks - with logging
-  ufw: rule=allow src={{ item }} log=yes
+  community.general.ufw: rule=allow src={{ item }} log=yes
   with_items: "{{ pandora_ufw_access_with_log }}"
 
 - name: ufw | allow incoming traffic for defined ports
-  ufw:
+  community.general.ufw:
     rule: allow
     interface: "{{ pandora_ufw_if }}"
     direction: in
@@ -37,7 +37,7 @@
   with_items: "{{ pandora_ufw_allow_ports_in }}"
 
 - name: ufw | allow {{ pandora_ufw_if }} outgoing traffic for defined ports
-  ufw:
+  community.general.ufw:
     rule: allow
     interface: "{{ pandora_ufw_if }}"
     direction: out
@@ -46,11 +46,11 @@
   with_items: "{{ pandora_ufw_allow_ports_out }}"
 
 - name: ufw | allow all outgoing traffic for defined interfaces
-  ufw: rule=allow interface={{ item }} direction=out
+  community.general.ufw: rule=allow interface={{ item }} direction=out
   with_items: "{{ pandora_ufw_allow_if_out }}"
 
 - name: ufw | default policy
-  ufw:
+  community.general.ufw:
     state: enabled
     direction: "{{ item }}"
     policy: "{{ pandora_ufw_default_policy }}"

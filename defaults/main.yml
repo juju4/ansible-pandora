@@ -47,7 +47,7 @@ pandora_logrotate_datformat: '-%Y%m%d'
 pandora_ufw: true
 pandora_ufw_if: eth0
 ## only affect incoming traffic
-#pandora_ufw_default_policy: allow
+# pandora_ufw_default_policy: allow
 pandora_ufw_default_policy: deny
 pandora_ufw_default_logging: medium
 # trusted sources for all ports
