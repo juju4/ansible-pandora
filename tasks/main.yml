@@ -94,6 +94,11 @@
   become: yes
   become_user: root
 
+- import_tasks: firewall-ufw.yml
+  become: yes
+  become_user: root
+  when: pandora_ufw|bool
+
 - import_tasks: systemd.yml
   become: yes
   become_user: root

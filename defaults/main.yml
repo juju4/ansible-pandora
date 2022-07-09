@@ -43,3 +43,37 @@ pandora_logrotate_compress: true
 pandora_logrotate_delaycompress: true
 pandora_logrotate_datext: true
 pandora_logrotate_datformat: '-%Y%m%d'
+
+pandora_ufw: true
+pandora_ufw_if: eth0
+## only affect incoming traffic
+#pandora_ufw_default_policy: allow
+pandora_ufw_default_policy: deny
+pandora_ufw_default_logging: medium
+# trusted sources for all ports
+pandora_ufw_access:
+  - 10.0.0.0/8
+  - 172.16.0.0/12
+  - 192.168.0.0/16
+pandora_ufw_access_with_log: []
+# opened ports for all sources
+pandora_ufw_allow_ports_in:
+  - '6100'
+pandora_ufw_out_logging: no
+pandora_ufw_allow_ports_out:
+  # - '22'
+  # - '25'
+  - '53'
+  - '123'
+  ## email/TLS?
+  - '587'
+  ## web (some apt updates are on http)
+  - '80'
+  - '443'
+  # - '8080'
+  ## gpg keyserver
+  # - '11371'
+  ## using dhcp?
+  # - '67'
+
+pandora_ufw_allow_if_out: []
