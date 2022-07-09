@@ -42,6 +42,10 @@ $ MOLECULE_DISTRO=ubuntu:20.04 molecule test --destroy=never
 
 ## Troubleshooting & Known issues
 
+* No identified logs files.
+* Analyzed files and previews are stored in `/var/_pandora/pandora/tasks/`.
+* Extensions considered as malicious by default are defined in pandora/workers/blocklists.py. This is independent of clean return by hashlookup. (example: dropzone.min.js)
+
 * pandora not starting after install, automatically or manually
 ```
 _pandora@test:~/pandora$ /usr/local/share/poetry/bin/poetry run update --yes
@@ -61,7 +65,11 @@ $ git pull --recurse-submodules origin main
 ```
 
 * pandora shutting down itself just after start
+Possibly related to systemd hardening or some missing components.
 
+* `[Errno 13] Permission denied: '/home/runner/.config/pypoetry/config.toml` at pandora install.
+This happens in GitHub action and only on Ubuntu 22.04
+It has not been reproducible locally.
 
 ## License
 
