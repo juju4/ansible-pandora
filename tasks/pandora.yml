@@ -1,18 +1,5 @@
 ---
 
-- name: ensure pandora user exists
-  ansible.builtin.user:
-    name: "{{ pandora_user }}"
-    home: "{{ pandora_home }}"
-    system: true
-
-- name: Ensure right permissions for pandora home
-  ansible.builtin.file:
-    path: "{{ pandora_home }}"
-    owner: "{{ pandora_user }}"
-    mode: '0755'
-    state: directory
-
 # if keeping as root, needs
 # git config --global --add safe.directory /var/_pandora/pandora
 # but can't update as pandora_user
@@ -24,8 +11,6 @@
     version: "{{ pandora_version }}"
     update: no
     force: no
-  become: yes
-  become_user: "{{ pandora_user }}"
 
 - name: Install pandora
   ansible.builtin.command: poetry install
@@ -34,9 +19,6 @@
     # creates: "{{ pandora_root }}/.cache/pypoetry/virtualenvs/pandora-<RANDOM>-py3.10/bin/weasyprint"
   environment:
     PATH: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:{{ poetry_root }}/bin"
-  become: yes
-  become_user: "{{ pandora_user }}"
-  become_flags: "-H"
   register: poetry_install
   changed_when: "'No dependencies to install or update' not in poetry_install.stdout"
 
@@ -108,7 +90,7 @@
   ansible.builtin.unarchive:
     src: "{{ pandora_home }}/dropzone-dist.zip"
     dest: "{{ pandora_home }}"
-    mode: '0600'
+    mode: '0700'
     remote_src: true
 
 - name: Download moment dist

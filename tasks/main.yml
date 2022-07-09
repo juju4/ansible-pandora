@@ -9,18 +9,33 @@
     dest: "{{ install_archives }}"
     state: directory
     mode: '0755'
+  become: yes
+  become_user: root
+
+- name: Grant user poetry access to archives
+  ansible.posix.acl:
+    path: "{{ install_archives }}"
+    entity: "{{ pandora_user }}"
+    etype: user
+    permissions: rwx
+    state: present
+  become: yes
+  become_user: root
 
 - name: Debian | Update cache
   ansible.builtin.apt:
     update_cache: yes
     cache_valid_time: "{{ pandora_apt_cache_valid_time | default('3600') }}"
   become: yes
+  become_user: root
   when: ansible_os_family == 'Debian'
 
 - name: Ensure dependencies packages are present
   ansible.builtin.package:
     name: "{{ pandora_pkgs }}"
     state: present
+  become: yes
+  become_user: root
   notify:
     - Updating ClamAV Signatures
 
@@ -32,10 +47,29 @@
     opts: "{{ item.opts }}"
     state: "{{ item.state }}"
   loop: "{{ pandora_fstab }}"
+  become: yes
+  become_user: root
   when: >
     not (ansible_virtualization_type is defined and
     (ansible_virtualization_type == "docker" or ansible_virtualization_type == "containerd")
     )
+
+- name: ensure pandora user exists
+  ansible.builtin.user:
+    name: "{{ pandora_user }}"
+    home: "{{ pandora_home }}"
+    system: true
+  become: yes
+  become_user: root
+
+- name: Ensure right permissions for pandora home
+  ansible.builtin.file:
+    path: "{{ pandora_home }}"
+    owner: "{{ pandora_user }}"
+    mode: '0755'
+    state: directory
+  become: yes
+  become_user: root
 
 - import_tasks: poetry.yml
   vars:
@@ -43,12 +77,26 @@
 
 - import_tasks: redis-source.yml
 - import_tasks: kvrocks-source.yml
+
 - import_tasks: pandora.yml
-- import_tasks: av-workers.yml
+  become: yes
+  become_user: "{{ pandora_user }}"
+
 - import_tasks: workers.yml
+  become: yes
+  become_user: "{{ pandora_user }}"
+
+- import_tasks: av-workers.yml
+  become: yes
+  become_user: root
+
 - import_tasks: apparmor.yml
+  become: yes
+  become_user: root
 
 - import_tasks: systemd.yml
+  become: yes
+  become_user: root
   when: >
     not (ansible_virtualization_type is defined and
           (ansible_virtualization_type == "docker" or ansible_virtualization_type == "containerd")

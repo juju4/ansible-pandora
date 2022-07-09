@@ -7,6 +7,8 @@
       - python3
       - python3-pip
     state: present
+  become: yes
+  become_user: root
 
 - name: Download install-poetry.py
   ansible.builtin.get_url:
@@ -14,13 +16,15 @@
     dest: "{{ install_archives }}/install-poetry.py"
     mode: '0755'
     checksum: "{{ pandora_poetry_hash }}"
+  become: yes
+  become_user: "{{ pandora_user }}"
 
 - name: Execute install-poetry.py
   ansible.builtin.command: "python3 {{ install_archives }}/install-poetry.py"
   environment:
     POETRY_HOME: "{{ poetry_root }}"
-  # become: yes
-  # become_user: "{{ poetry_user }}"
+  become: yes
+  become_user: root
   args:
     creates: "{{ poetry_root }}/bin/poetry"
 
@@ -30,3 +34,5 @@
     PATH: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:{{ poetry_root }}/bin"
   args:
     creates: /etc/bash_completion.d/poetry.bash-completion
+  become: yes
+  become_user: root
