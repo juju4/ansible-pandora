@@ -1,0 +1,8 @@
+---
+
+- name: Ensure that pandora files are purged regularly
+  ansible.builtin.cron:
+    name: "pandora tasks purge"
+    minute: "0"
+    hour: "1"
+    job: "find {{ pandora_root }}/tasks/ -mtime {{ pandora_purge_mtime }} -exec rm {} \;"

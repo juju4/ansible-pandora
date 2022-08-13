@@ -1,0 +1,20 @@
+---
+
+- name: Enable Recent Tasks page availability
+  ansible.builtin.lineinfile:
+    path: "{{ pandora_root }}/pandora/website/web/__init__.py"
+    mode: '0644'
+    regexp: '^    return redirect'
+    line: "    return redirect(url_for('api_root'), 302)"
+    insertafter: '^def api_tasks():'
+    state: absent
+  when: pandora_recent_tasks|bool
+
+- name: Disable Recent Tasks page availability
+  ansible.builtin.lineinfile:
+    path: "{{ pandora_root }}/pandora/website/web/__init__.py"
+    mode: '0644'
+    regexp: '^    return redirect'
+    line: "    return redirect(url_for('api_root'), 302)"
+    insertafter: '^def api_tasks():'
+  when: not pandora_recent_tasks|bool

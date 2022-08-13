@@ -11,6 +11,16 @@ pandora_listen_ip: 0.0.0.0
 pandora_listen_port: 6100
 pandora_public_url: "http://0.0.0.0:6100"
 pandora_lookyloo_url: ""
+pandora_email_smtp_host: localhost
+pandora_email_smtp_port: 25
+pandora_email_to: ["Investigation Team <investigation_unit@myorg.local>"]
+pandora_email_from: "Pandora <pandora@myorg.local>"
+# turn false to disable recent tasks access
+pandora_recent_tasks: true
+
+# delete files older than 30 days
+pandora_purge_enabled: true
+pandora_purge_mtime: +30
 
 pandora_cgroups_restriction_enable: true
 
@@ -58,7 +68,11 @@ pandora_ufw_access:
 pandora_ufw_access_with_log: []
 # opened ports for all sources
 pandora_ufw_allow_ports_in:
+  # direct access?
   - '6100'
+  # or via reverse proxy
+  - '80'
+  - '443'
 pandora_ufw_out_logging: no
 pandora_ufw_allow_ports_out:
   # - '22'

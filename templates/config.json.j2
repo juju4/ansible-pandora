@@ -22,10 +22,10 @@
         "tls_verify": true
     },
     "email": {
-        "smtp_host": "localhost",
-        "smtp_port": "25",
-        "to": ["Investigation Team <investigation_unit@myorg.local>"],
-        "from": "Pandora <pandora@myorg.local>"
+        "smtp_host": "{{ pandora_email_smtp_host }}",
+        "smtp_port": "{{ pandora_email_smtp_port }}",
+        "to": ["{{ pandora_email_to }}"],
+        "from": "{{ pandora_email_from }}"
     },
     "weasyprint_fetch_ressources": false,
     "systemd_service_name": "pandora",

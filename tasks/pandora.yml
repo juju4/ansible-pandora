@@ -122,3 +122,9 @@
     - { s: dist/dropzone-min.js, d: js/lib/dropzone-min.js }
     - { s: dist/dropzone.css, d: css/lib/dropzone.css }
     - { s: "moment-{{ pandora_moment_version }}/min/moment-with-locales.min.js", d: js/lib/moment-with-locales.min.js }
+
+- import_tasks: recent_tasks.yml
+  when: pandora_recent_tasks|bool
+
+- import_tasks: purge.yml
+  when: pandora_purge_enabled|bool
