@@ -65,7 +65,7 @@
       failed_when: false
 
     - name: Ensure pandora processes are running
-      ansible.builtin.command: pgrep -u _pandora python
+      ansible.builtin.command: pgrep -u _pandora python || pgrep -u _pandora gunicorn
       register: ps3
       changed_when: false
       failed_when: false
