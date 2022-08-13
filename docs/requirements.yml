@@ -2,34 +2,35 @@
 # requirements for azure-jumphost.yml
 # $ ansible-galaxy install -r requirements.yml
 
-- src: https://github.com/juju4/ansible-harden-sysctl/
-  version: master
-  name: juju4.harden_sysctl
-- src: https://github.com/juju4/ansible-harden/
-  version: master
-  name: juju4.harden
-- src: https://github.com/juju4/ansible-falco/
-  version: master
-  name: juju4.falco
-- src: https://github.com/juju4/ansible-osquery/
-  version: master
-  name: juju4.osquery
-- src: https://github.com/juju4/ansible-auditd/
-  version: master
-  name: juju4.auditd
-- src: https://github.com/juju4/ansible-pandora/
-  version: master
-  name: juju4.pandora
-- src: https://github.com/juju4/ansible-tinyproxy/
-  version: master
-  name: juju4.tinyproxy
-- src: https://github.com/juju4/ansible-harden-nginx/
-  version: master
-  name: juju4.harden_nginx
-- name: cloudalchemy.node_exporter
-- name: cloudalchemy.prometheus
-- name: cloudalchemy.grafana
+roles:
+  - src: https://github.com/juju4/ansible-harden-sysctl/
+    version: master
+    name: juju4.harden_sysctl
+  - src: https://github.com/juju4/ansible-harden/
+    version: master
+    name: juju4.harden
+  - src: https://github.com/juju4/ansible-falco/
+    version: master
+    name: juju4.falco
+  - src: https://github.com/juju4/ansible-osquery/
+    version: master
+    name: juju4.osquery
+  - src: https://github.com/juju4/ansible-auditd/
+    version: master
+    name: juju4.auditd
+  - src: https://github.com/juju4/ansible-pandora/
+    version: master
+    name: juju4.pandora
+  - src: https://github.com/juju4/ansible-tinyproxy/
+    version: master
+    name: juju4.tinyproxy
+  - src: https://github.com/juju4/ansible-harden-nginx/
+    version: master
+    name: juju4.harden_nginx
+  - name: cloudalchemy.node_exporter
+  - name: cloudalchemy.prometheus
+  - name: cloudalchemy.grafana
 
 collections:
-  - azure.azcollection
-  - community.general
+  - name: azure.azcollection
+  - name: community.general
