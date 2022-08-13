@@ -1,0 +1,161 @@
+---
+
+- name: Digital Ocean | create droplet
+  hosts: localhost
+  collections:
+    - community.digitalocean.digital_ocean_droplet
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+    droplet_name: dopandora
+  handlers:
+    - name: wait 5 sec if vm state changed to ensure system is up
+      ansible.builtin.pause: seconds=5
+  tasks:
+    - name: Gather ID about DigitalOcean SSH keys
+      community.digitalocean.digital_ocean_sshkey_info:
+        oauth_token: "{{ digitalocean_oauth_token }}"
+      register: ssh_keys
+      when: false
+
+    - name: Check if droplet exists
+      community.digitalocean.digital_ocean_droplet_info:
+        oauth_token: "{{ digitalocean_oauth_token }}"
+        name: "{{ droplet_name }}"
+      failed_when: false
+      register: exist
+
+      # Not idempotent so getting digital_ocean_droplet_info first
+      # Note: my_droplet.data.ip_address not returned anymore. only on info call.
+    - name: Create droplet
+      community.digitalocean.digital_ocean_droplet:
+        state: present
+        name: "{{ droplet_name }}"
+        oauth_token: "{{ digitalocean_oauth_token }}"
+        size: 8gb
+        region: tor1
+        image: ubuntu-22-04-x64
+        wait_timeout: 500
+        # This must be digitalocean ID, not ssh key file or values.
+        ssh_keys: "{{ digitalocean_public_keys }}"
+        ipv6: true
+        monitoring: true
+        unique_name: true
+        tags:
+          - test
+      register: my_droplet
+      when: "exist.msg is defined and 'Unable to find droplet with name' in exist.msg"
+      notify:
+        - wait 5 sec if vm state changed to ensure system is up
+
+    - name: Gather information about droplet with network
+      community.digitalocean.digital_ocean_droplet_info:
+        oauth_token: "{{ digitalocean_oauth_token }}"
+        name: "{{ droplet_name }}"
+      register: my_droplet2
+
+    # Note networks has an attribute type=public but order seems non-deterministic
+    - name: Debug | Droplet ID and IP address
+      ansible.builtin.debug:
+        msg: "ID is {{ my_droplet2.data[0].id }}, IP is {{ my_droplet2.data[0].networks.v4[0].ip_address }}"
+
+    - name: Add instance to the host group
+      ansible.builtin.add_host:
+        hostname: "{{ droplet_name }}"
+        ansible_host: "{{ my_droplet2.data[0].networks.v4[0].ip_address }}"
+        ansible_user: "root"
+        ansible_ssh_private_key_file: /home/user/.ssh/id_rsa
+        groups:
+          - digitalocean
+          - pandoragroup
+          - testing
+
+    - name: Check ansible group
+      ansible.builtin.debug:
+      with_items: "{{ groups['pandoragroup'] }}"
+    - name: Edit local ~/.ssh/config
+      ansible.builtin.blockinfile:
+        path: /home/user/.ssh/config
+        marker: "# {mark} ANSIBLE MANAGED BLOCK"
+        block: |
+          # pandora
+          Host {{ hostvars[item].inventory_hostname }}
+              Hostname {{ hostvars[item].ansible_host }}
+              User {{ hostvars[item].ansible_user }}
+              IdentityFile {{ hostvars[item].ansible_ssh_private_key_file }}
+              {% if jumphost_required is defined and jumphost_required %}
+              ForwardAgent yes
+              ProxyJump {{ jumphost_ssh }}
+              {% endif %}
+      with_items: "{{ groups['pandoragroup'] }}"
+
+- name: Configure test do server
+  hosts: pandoragroup
+  become: yes
+  # environment:
+  #   http_proxy: "{{ lookup('env', 'http_proxy') }}"
+  #   https_proxy: "{{ lookup('env', 'https_proxy') }}"
+  #   no_proxy: "{{ lookup('env', 'no_proxy') }}"
+  vars:
+    # become unprivileged user from privileged one?
+    # https://docs.ansible.com/ansible/latest/user_guide/become.html#risks-of-becoming-an-unprivileged-user
+    # https://github.com/ansible/ansible/issues/16052
+    # allow_world_readable_tmpfiles: true
+    adduser_public_keys: "{{ common_deploy_public_keys | default([]) }}"
+    adduser_password: "{{ vault_local_user_password | default(omit) }}"
+    adduser_sudoroot: true
+    adduser_sudoroot_nopasswd: true
+    adduser_sudoroot_nopasswd_cmd: 'ALL'
+    adduser_expires: '-1'
+    tinyproxy_filters:
+      - proxy-filters-pandora
+    tinyproxy_allow:
+      # why?
+      - '::'
+  pre_tasks:
+    - name: validate ansible_remote_tmp dir permissions
+      ansible.builtin.file:
+        path: "{{ ansible_remote_tmp }}"
+        state: directory
+        mode: '1777'
+      when: ansible_remote_tmp is defined and ansible_remote_tmp != '/tmp'
+    - name: Set root password
+      ansible.builtin.user:
+        name: root
+        password: "{{ root_password | default(omit) }}"
+        update_password: always
+    - name: Debian | update apt cache
+      ansible.builtin.apt:
+        update_cache: yes
+        cache_valid_time: 3600
+      when: ansible_os_family == 'Debian'
+    - name: Update latest packages
+      ansible.builtin.package:  # noqa package-latest
+        name: '*'
+        state: latest
+      register: pkg_result
+      until: pkg_result
+    - name: Pause 10 sec to avoid apt lock
+      ansible.builtin.pause: seconds=10
+      # update DNS= in /etc/systemd/resolved.conf?
+  roles:
+    - juju4.adduser
+    - juju4.tinyproxy
+
+# Partly mimic github workflow
+- name: Configure test do server - unprivileged
+  hosts: pandoragroup
+  become: yes
+  become_user: deploy
+  # environment:
+  #   http_proxy: "{{ lookup('env', 'http_proxy') }}"
+  #   https_proxy: "{{ lookup('env', 'https_proxy') }}"
+  #   no_proxy: "{{ lookup('env', 'no_proxy') }}"
+  vars:
+    pandora_fstab:
+      # - { src: 'LABEL=cloudimg-rootfs', path: /, fstype: ext4, opts: "discard,errors=remount-ro,acl", state: remounted }
+      - { src: /dev/vda1, path: /, fstype: ext4, opts: "discard,errors=remount-ro,acl", state: remounted }
+  roles:
+    - juju4.pandora
+
+- name: pandora validation
+  import_playbook: ../git-roles/juju4.pandora/molecule/default/verify.yml

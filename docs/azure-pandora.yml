@@ -1,0 +1,525 @@
+---
+# https://docs.ansible.com/ansible/latest/scenario_guides/guide_azure.html
+
+- name: Create Azure infrastructure for pandora
+  hosts: localhost
+  gather_facts: no
+  vars:
+    base_rg: pandora
+    base_name: pandora
+    azure_location: eastus
+    azure_rg_tags:
+      role: testing, CIRCL pandora
+      environment: dev
+    azure_tags: "{{ azure_rg_tags }}"
+
+    # VM
+    base_vm_size: Standard_B4ms
+    # base_vm_size: Standard_D4_v3
+    base_adminuser_login: 'myadmin'
+    base_adminuser_password: 'Myadmin1_to_change...'
+    base_adminuser_sshkeyfile: "/home/user/.ssh/id_rsa.pub"
+    base_adminuser_sshkeyfile_priv: "/home/user/.ssh/id_rsa"
+    base_adminuser_sshkey: "{{ lookup('file', base_adminuser_sshkeyfile) }}"
+    linux_vm_ssh_keys:
+      - path: "/home/{{ base_adminuser_login }}/.ssh/authorized_keys"
+        key_data: "{{ base_adminuser_sshkey }}"
+    az_image:
+      version: latest
+      publisher: Canonical
+      # offer: 0001-com-ubuntu-server-focal
+      # sku: '20_04-lts'
+      offer: 0001-com-ubuntu-server-jammy
+      sku: '22_04-lts-gen2'
+    # az_image:
+    #   id: /subscriptions/GUID/resourceGroups/RG/providers/Microsoft.Compute/galleries/GALLERT/images/IMAGE/versions/latest
+    azurebastion: false
+
+    # Networking with new virtual network and subnet
+    base_vn: 10.201.100.0/24
+    base_subnet: 10.201.100.0/25
+    # Networking with existing private IP virtual network and subnet that is peered on an express route
+    # (leave empty if not using else will take priority)
+    # using resourceid as different resource group as NIC
+    # target_vnet_name: EUS-SIO-Playground-Vnet-10-56-78-128-26
+    # 'Microsoft.Network/virtualNetworks/subnets/join/action' permission needed ~ Network Contributor
+    target_vnet_name: ''
+    # target_vnet_name: /subscriptions/GUID/resourceGroups/RG/providers/Microsoft.Network/virtualNetworks/VNET
+    target_subnet_name: ''
+
+    az_ip_allowlist_ssh:
+      # - x.x.x.x
+      # private LAN with express route
+      # not required as default rule AllowVnetInBound unless early deny rule.
+      - 10.0.0.0/8
+    az_ip_allowlist_web:
+      # - x.x.x.x
+      # private LAN with express route
+      # not required as default rule AllowVnetInBound unless early deny rule.
+      - 10.0.0.0/8
+
+    dns_host_address:
+      # https://docs.microsoft.com/en-us/azure/virtual-network/what-is-ip-address-168-63-129-16
+      - 168.63.129.16
+      # https://docs.umbrella.com/deployment-umbrella/docs/point-your-dns-to-cisco
+      - 208.67.222.222
+      - 208.67.220.220
+      - 208.67.221.76
+    # https://docs.microsoft.com/en-us/microsoft-365/enterprise/urls-and-ip-address-ranges?view=o365-worldwide
+    smtp_host_address:
+      - 13.107.6.152/31
+      - 13.107.18.10/31
+      - 13.107.128.0/22
+      - 23.103.160.0/20
+      - 40.96.0.0/13
+      - 40.104.0.0/15
+      - 52.96.0.0/14
+      - 131.253.33.215/32
+      - 132.245.0.0/16
+      - 150.171.32.0/22
+      - 204.79.197.215/32
+    # , 2603:1006::/40, 2603:1016::/36, 2603:1026::/36, 2603:1036::/36, 2603:1046::/36, 2603:1056::/36, 2620:1ec:4::152/128, 2620:1ec:4::153/128, 2620:1ec:c::10/128, 2620:1ec:c::11/128, 2620:1ec:d::10/128, 2620:1ec:d::11/128, 2620:1ec:8f0::/46, 2620:1ec:900::/46, 2620:1ec:a92::152/128, 2620:1ec:a92::153/128, 2a01:111:f400::/48"
+    base_nsg_rules:
+      - name: SSH
+        protocol: Tcp
+        destination_port_range: 22
+        access: Allow
+        priority: 1001
+        direction: Inbound
+        source_address_prefix: "{{ az_ip_allowlist_ssh }}"
+      - name: HTTP
+        protocol: Tcp
+        destination_port_range: 80
+        access: Allow
+        priority: 1005
+        direction: Inbound
+        source_address_prefix: "{{ az_ip_allowlist_web }}"
+      - name: HTTPS
+        protocol: Tcp
+        destination_port_range: 443
+        access: Allow
+        priority: 1006
+        direction: Inbound
+        source_address_prefix: "{{ az_ip_allowlist_web }}"
+      # Allow or not
+      - name: HTTP-gunicorn
+        protocol: Tcp
+        destination_port_range: 6100
+        access: Allow
+        priority: 1008
+        direction: Inbound
+        source_address_prefix: "{{ az_ip_allowlist_web }}"
+      # - name: Test-CatchAll
+      #   #protocol: Tcp
+      #   destination_port_range: 1024-65535
+      #   # to avoid ports with Azure warning (rdp/3389, postgres/5432...)
+      #   #destination_port_range: 6000-65535
+      #   access: Allow
+      #   priority: 1100
+      #   direction: Inbound
+      #   source_address_prefix: "*"
+      - name: DenyAllInBound-early
+        destination_port_range: "*"
+        access: Deny
+        priority: 4000
+        direction: Inbound
+        source_address_prefix: "*"
+      - name: DNS-Udp-Out
+        protocol: Udp
+        destination_port_range: 53
+        access: Allow
+        priority: 2001
+        direction: Outbound
+        source_address_prefix: "*"
+        destination_address_prefix: "{{ dns_host_address | default('*') }}"
+      - name: HTTPS-Out
+        protocol: Tcp
+        destination_port_range: 443
+        access: Allow
+        priority: 2002
+        direction: Outbound
+        source_address_prefix: "*"
+      - name: HTTP-Out
+        protocol: Tcp
+        destination_port_range: 80
+        access: Allow
+        priority: 2003
+        direction: Outbound
+        source_address_prefix: "*"
+      - name: Submission-Tcp-Out
+        protocol: Tcp
+        destination_port_range: 587
+        access: Allow
+        priority: 3000
+        direction: Outbound
+        source_address_prefix: "*"
+        destination_address_prefix: "{{ smtp_host_address | default('*') }}"
+      - name: DenyAllOutBound-early
+        destination_port_range: "*"
+        access: Deny
+        priority: 4000
+        direction: Outbound
+        source_address_prefix: "*"
+
+    # require permission to target Azure Log Analytics
+    # role 'Log Analytics Contributor': ok
+    # role c_lab_logs_analytics_add_diagnostics: 'Log Analytics Reader' and Microsoft.OperationalInsights/workspaces/sharedKeys/action
+    # (or enforce it by Azure Policy)
+    ala_target_name: "ALA_NAME"
+    ala_target_rg: "ALA_RG"
+
+  collections:
+    - azure.azcollection
+    - community.azure
+  handlers:
+    - name: wait a bit if vm state changed to ensure system is up
+      ansible.builtin.pause: seconds=5
+  tasks:
+    # General
+    - name: Create resource group
+      azure.azcollection.azure_rm_resourcegroup:
+        name: "{{ base_rg }}"
+        location: "{{ azure_location }}"
+        tags: "{{ azure_rg_tags }}"
+
+    - name: Create virtual network
+      azure.azcollection.azure_rm_virtualnetwork:
+        resource_group: "{{ base_rg }}"
+        name: "{{ base_name }}vn001"
+        address_prefixes: "{{ base_vn }}"
+        tags: "{{ azure_tags }}"
+      when: not target_vnet_name|string
+
+    - name: Add subnet
+      azure.azcollection.azure_rm_subnet:
+        resource_group: "{{ base_rg }}"
+        name: "{{ base_name }}subnet001"
+        address_prefix: "{{ base_subnet }}"
+        virtual_network: "{{ base_name }}vn001"
+      when: not (target_vnet_name|string and target_subnet_name|string)
+
+    - name: Azure Bastion
+      block:
+        # https://docs.microsoft.com/en-us/azure/bastion/bastion-create-host-portal
+        # Bastion will require RSA private key or password
+        - name: Add Bastion subnet
+          azure.azcollection.azure_rm_subnet:
+            resource_group: "{{ base_rg }}"
+            name: "AzureBastionSubnet"
+            address_prefix: "192.168.250.0/24"
+            virtual_network: "{{ base_name }}vn001"
+
+        - name: Create Azure Bastion
+          azure.azcollection.azure_rm_deployment:
+            resource_group: "{{ base_rg }}"
+            location: "{{ azure_location }}"
+            name: AzureBastion4pandora
+            parameters:
+              vnet-name:
+                value: "{{ base_name }}vn001"
+              vnet-ip-prefix:
+                value: "{{ base_vn }}"
+              vnet-new-or-existing:
+                value: 'existing'
+              bastion-subnet-ip-prefix:
+                value: '192.168.250.0/24'
+              location:
+                value: "{{ azure_location }}"
+            template_link: 'https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/101-azure-bastion/azuredeploy.json'
+          register: azurebastion
+      when: azurebastion|bool
+
+    - name: Create network security group
+      azure.azcollection.azure_rm_securitygroup:
+        resource_group: "{{ base_rg }}"
+        name: "{{ base_name }}secgroup001"
+        rules: "{{ base_nsg_rules }}"
+        tags: "{{ azure_tags }}"
+
+    # Linux
+    - name: Create VM public ip address
+      azure.azcollection.azure_rm_publicipaddress:
+        resource_group: "{{ base_rg }}"
+        name: "{{ base_name }}PublicIP0"
+        allocation_method: Static
+        tags:
+          role: "Linux VM0"
+      when: not (target_vnet_name|string and target_subnet_name|string)
+
+    - name: Create VM NIC - public ip
+      azure.azcollection.azure_rm_networkinterface:
+        resource_group: "{{ base_rg }}"
+        name: "{{ base_name }}nic0"
+        virtual_network: "{{ base_name }}vn001"
+        subnet: "{{ base_name }}subnet001"
+        security_group: "{{ base_name }}secgroup001"
+        ip_configurations:
+          - name: ipconfig1
+            public_ip_address_name: "{{ base_name }}PublicIP0"
+      when: not (target_vnet_name|string and target_subnet_name|string)
+
+    - name: Create VM NIC - existing given vnet
+      azure.azcollection.azure_rm_networkinterface:
+        resource_group: "{{ base_rg }}"
+        name: "{{ base_name }}nic0"
+        virtual_network: "{{ target_vnet_name }}"
+        subnet: "{{ target_subnet_name }}"
+        security_group: "{{ base_name }}secgroup001"
+      when: (target_vnet_name|string and target_subnet_name|string)
+
+    - name: Create VM virtual machine
+      azure.azcollection.azure_rm_virtualmachine:
+        resource_group: "{{ base_rg }}"
+        name: "{{ base_name }}vm"
+        vm_size: "{{ base_vm_size | default('Standard_D1_v2') }}"
+        managed_disk_type: "{{ base_managedisk | default('Standard_LRS') }}"
+        boot_diagnostics:
+          enabled: yes
+        admin_username: "{{ base_adminuser_login }}"
+        admin_password: "{{ base_adminuser_password }}"
+        # ssh_password_enabled: false
+        # for bastion
+        ssh_password_enabled: true
+        ssh_public_keys: "{{ linux_vm_ssh_keys }}"
+        network_interfaces: "{{ base_name }}nic0"
+        image: "{{ az_image }}"
+        tags: "{{ azure_tags }}"
+      register: vmout
+      notify:
+        - wait a bit if vm state changed to ensure system is up
+
+    - name: Get facts for VM
+      azure.azcollection.azure_rm_virtualmachine_info:
+        resource_group: "{{ base_rg }}"
+        name: "{{ base_name }}vm"
+      register: vmfacts
+    - name: Debug | VM facts
+      ansible.builtin.debug: var=vmfacts verbosity=1
+    # - ansible.builtin.pause:
+
+    - name: Set fact | VM public ip
+      set_fact:
+        vm_ip: "{{ azure_vm.properties.networkProfile.networkInterfaces[0].properties.ipConfigurations[0].properties.publicIPAddress.properties.ipAddress }}"
+      when: not target_vnet_name|string
+    - name: Set fact | VM existing vnet ip
+      set_fact:
+        vm_ip: "{{ azure_vm.properties.networkProfile.networkInterfaces[0].properties.ipConfigurations[0].properties.privateIPAddress }}"
+      when: target_vnet_name|string
+
+    - name: Add instance to the host group
+      ansible.builtin.add_host:
+        hostname: "{{ base_name }}"
+        ansible_host: "{{ vm_ip }}"
+        ansible_user: "{{ base_adminuser_login }}"
+        ansible_ssh_private_key_file: "{{ base_adminuser_sshkeyfile_priv }}"
+        groups:
+          - azure_vms
+          - pandoragroup
+
+    - name: Flush handlers
+      ansible.builtin.meta: flush_handlers
+
+    - name: Debug | vmout
+      ansible.builtin.debug: var=vmout
+    - name: Get all diagnostic settings for VM
+      azure_rm_monitordiagnosticsetting_info:
+        resource: "{{ vmout.ansible_facts.azure_vm.id }}"
+
+    # https://docs.microsoft.com/en-us/azure/virtual-machines/extensions/guest-configuration
+    - name: Create VM Extension ConfigurationforLinux
+      azure_rm_virtualmachineextension:
+        name: ConfigurationforLinux
+        publisher: Microsoft.GuestConfiguration
+        type_handler_version: 1.0
+        virtual_machine_extension_type: ConfigurationforLinux
+        # settings: '{"commandToExecute": "hostname"}'
+        auto_upgrade_minor_version: true
+        resource_group: "{{ base_rg }}"
+        location: "{{ azure_location }}"
+        virtual_machine_name: "{{ base_name }}vm"
+
+    # https://docs.microsoft.com/en-us/azure/virtual-machines/extensions/diagnostics-linux?tabs=azcli
+    # Ubuntu 20.04, RHEL/Centos8 not listed...
+    # https://docs.microsoft.com/en-us/azure/virtual-machines/extensions/diagnostics-linux-v3
+    # has 20.04, not 22.04
+    # requires python2 and
+    # sudo update-alternatives --install /usr/bin/python python /usr/bin/python2 1
+    # Note: documentation review seems to imply logs only to EventHub or BlobStorage (Azure Monitor only for Metrics)
+    - name: Create VM Extension LinuxDiagnostic
+      azure_rm_virtualmachineextension:
+        name: LinuxDiagnostic
+        publisher: Microsoft.Azure.Diagnostics
+        type_handler_version: 3.0
+        virtual_machine_extension_type: LinuxDiagnostic
+        # settings: '{"commandToExecute": "hostname"}'
+        auto_upgrade_minor_version: true
+        resource_group: "{{ base_rg }}"
+        location: "{{ azure_location }}"
+        virtual_machine_name: "{{ base_name }}vm"
+      when: false
+
+    # "You will need to have version 3.0 or higher of the Linux Diagnostic extension installed in order to edit your diagnostic settings through the portal."
+    - name: Create diagnostic setting for VM
+      azure_rm_monitordiagnosticsetting:
+        name: "Diagnostics2labsentinel"
+        resource:
+          name: "{{ base_name }}vm"
+          type: "Microsoft.Compute/virtualMachines"
+          resource_group: "{{ base_rg }}"
+        log_analytics:
+          name: "{{ ala_target_name }}"
+          resource_group: "{{ ala_target_rg }}"
+        logs:
+          - category: "TBD"
+      when: false
+
+    - name: Create/Update Azure Recovery Service vault
+      azure.azcollection.azure_rm_recoveryservicesvault:
+        resource_group: "{{ base_rg }}"
+        name: "{{ base_name }}BackupVault"
+        location: "{{ azure_location }}"
+        state: 'present'
+
+    - name: Create a daily VM backup policy
+      azure.azcollection.azure_rm_backuppolicy:
+        resource_group: "{{ base_rg }}"
+        vault_name: "{{ base_name }}BackupVault"
+        name: DailyBackup
+        state: present
+        backup_management_type: "AzureIaasVM"
+        schedule_run_frequency: "Daily"
+        instant_recovery_snapshot_retention: 2
+        daily_retention_count: 30
+        time_zone: UTC
+        schedule_run_time: 0
+      register: backuppolicy
+
+    - name: Debug | backuppolicy
+      ansible.builtin.debug: var=backuppolicy
+
+    - name: Get Recovery Point Details
+      azure.azcollection.azure_rm_backupazurevm_info:
+        resource_group: "{{ base_rg }}"
+        recovery_vault_name: "{{ base_name }}BackupVault"
+        resource_id: "{{ azure_vm.id }}"
+      register: recoverypoint
+
+    - name: Enabling/Updating protection for the Azure VM
+      azure.azcollection.azure_rm_backupazurevm:
+        resource_group: "{{ base_rg }}"
+        recovery_vault_name: "{{ base_name }}BackupVault"
+        resource_id: "{{ azure_vm.id }}"
+        backup_policy_id: "{{ backuppolicy.id }}"
+        state: 'create'
+      when: not recoverypoint.response.id|string
+
+- name: Add host to local ssh config for jumphost
+  hosts: localhost
+  connection: local
+  tasks:
+    - name: Debug | hostvars
+      ansible.builtin.debug:
+        var: "{{ hostvars[item] }}"
+      with_items: "{{ groups['pandoragroup'] }}"
+    - name: Edit local ~/.ssh/config
+      ansible.builtin.blockinfile:
+        path: /home/user/.ssh/config
+        marker: "# {mark} ANSIBLE MANAGED BLOCK {{ hostvars[item].ansible_host }} - pandora"
+        block: |
+          # {{ hostvars[item].inventory_hostname }}
+          Host {{ hostvars[item].ansible_host }}
+              Hostname {{ hostvars[item].ansible_host }}
+              User {{ hostvars[item].ansible_user }}
+              IdentityFile {{ hostvars[item].ansible_ssh_private_key_file }}
+              {% if jumphost_required is defined and jumphost_required %}
+              ForwardAgent yes
+              ProxyJump {{ jumphost_ssh }}
+              {% endif %}
+      with_items: "{{ groups['pandoragroup'] }}"
+      when: false
+
+- name: Configure pandora VM host
+  hosts: pandoragroup
+  become: yes
+  # environment:
+  #   http_proxy: "{{ lookup('env', 'http_proxy') }}"
+  #   https_proxy: "{{ lookup('env', 'https_proxy') }}"
+  #   no_proxy: "{{ lookup('env', 'no_proxy') }}"
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+    ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
+    base_name: pandora
+    adduser_public_keys: "{{ common_deploy_public_keys | default([]) }}"
+    adduser_password: "{{ vault_local_user_password | default(omit) }}"
+    adduser_sudoroot: true
+    adduser_sudoroot_nopasswd: true
+    adduser_sudoroot_nopasswd_cmd: 'ALL'
+    adduser_expires: '-1'
+    tinyproxy_filters:
+      - proxy-filters-pandora
+    tinyproxy_allow:
+      # why?
+      - '::'
+    monitoring_enable: true
+    harden_sshd_allowusers: 'deploy myadmin'
+    # have ufw in pandora + azure nsg
+    harden_fw: false
+    # else no make/gcc for user _pandora, eventually after initial install
+    harden_restrict_compiler: false
+  collections:
+    - community.general
+  pre_tasks:
+    - name: Check host is reachable
+      ansible.builtin.ping:
+    - name: Set root password
+      ansible.builtin.user:
+        name: root
+        password: "{{ root_password | default(omit) }}"
+        update_password: always
+    - name: Debian | update apt cache
+      ansible.builtin.apt:
+        update_cache: yes
+        cache_valid_time: 3600
+      when: ansible_os_family == 'Debian'
+    - name: Update latest packages
+      ansible.builtin.package:  # noqa package-latest
+        name: '*'
+        state: latest
+  roles:
+    - juju4.adduser
+    - juju4.tinyproxy
+    - juju4.harden
+    - kbrebanov.osquery
+    # - juju4.falco
+    - { role: cloudalchemy.node_exporter, when: monitoring_enable|bool }
+    - { role: cloudalchemy.prometheus, when: monitoring_enable|bool }
+    - { role: cloudalchemy.grafana, when: monitoring_enable|bool }
+
+- name: Configure pandora VM host - unprivileged
+  hosts: pandoragroup
+  # {"msg": "Failed to set permissions on the temporary files Ansible needs to create when becoming an unprivileged user (rc: 1, err: chmod: invalid mode: ‘A+user:deploy:rx:allow’\nTry 'chmod --help' for more information.\n}). For information on working around this, see https://docs.ansible.com/ansible-core/2.12/user_guide/become.html#risks-of-becoming-an-unprivileged-user"}
+  # become: yes
+  # become_user: deploy
+  # environment:
+  #   http_proxy: "{{ lookup('env', 'http_proxy') }}"
+  #   https_proxy: "{{ lookup('env', 'https_proxy') }}"
+  #   no_proxy: "{{ lookup('env', 'no_proxy') }}"
+  vars:
+    # pandora_fstab:
+    #   - { src: 'LABEL=cloudimg-rootfs', path: /, fstype: ext4, opts: "discard,errors=remount-ro,acl", state: remounted }
+    #   - { src: /dev/vda1, path: /, fstype: ext4, opts: "discard,errors=remount-ro,acl", state: remounted }
+    hardenwebserver_http_redirect_to_https: true
+    hardenwebserver_nginx_https_server_include:
+      - { name: pandora, src: pandora-nginx.j2 }
+    hardenwebserver_systemd_dir_acl:
+      - { p: "/etc/ssl/private", perm: rx, m: '0700' }
+      - { p: "/var/log/nginx", perm: rwx, m: '0755' }
+    hardenwebserver_systemd_files_acl:
+      - { p: "/etc/ssl/private/{{ ansible_fqdn }}.key", perm: r }
+      - { p: "/etc/ssl/{{ ansible_fqdn }}.crt", perm: r }
+  roles:
+    - juju4.pandora
+    - { role: juju4.harden_nginx, become: yes, become_user: root }
+
+- name: pandora validation
+  import_playbook: ../git-roles/juju4.pandora/molecule/default/verify.yml

@@ -28,6 +28,8 @@ For example
     - juju4.pandora
 ```
 
+See also docs folder for example playbooks for Azure and Digital Ocean
+
 ## Variables
 
 TBD
