@@ -4,12 +4,19 @@
   hosts: pandora
   gather_facts: true
   vars:
-    pandora_start: /var/_pandora/pandora/bin/start.py
-    binary_redis: /var/_pandora/redis/src/redis-server
-    binary_kvrocks: /var/_pandora/kvrocks/src/kvrocks
-    config: /var/_pandora/pandora/config/generic.json
+    pandora_home: /var/_pandora
+    pandora_start: "{{ pandora_home }}/pandora/bin/start.py"
+    binary_redis: "{{ pandora_home }}/redis/src/redis-server"
+    binary_kvrocks: "{{ pandora_home }}/kvrocks/src/kvrocks"
+    config: "{{ pandora_home }}/pandora/config/generic.json"
     ports:
+      # kvrocks
       - { h: localhost, p: 6101 }
+      # redis: socket only
+      # - { h: localhost, p: 6379 }
+      # soffice
+      - { h: localhost, p: 2002 }
+      # gunicorn
       - { h: 0.0.0.0, p: 6100 }
     url: http://localhost:6100
   pre_tasks:
@@ -65,7 +72,7 @@
       failed_when: false
 
     - name: Ensure pandora processes are running
-      ansible.builtin.command: pgrep -u _pandora python || pgrep -u _pandora gunicorn
+      ansible.builtin.shell: pgrep -u _pandora python || pgrep -u _pandora gunicorn
       register: ps3
       changed_when: false
       failed_when: false
@@ -83,6 +90,14 @@
       register: psa
     - name: Debug | ps aux output
       ansible.builtin.debug: var=psa verbosity=1
+
+    - name: Get stats of redis cache socket
+      ansible.builtin.stat:
+        path: "{{ pandora_home }}/pandora/cache/cache.sock"
+      register: st
+    - name: Validate redis cache socket is present
+      ansible.builtin.assert:
+        that: st.stat.exists and st.stat.issock
 
     - name: Ensure ports are listening
       ansible.builtin.wait_for:
