@@ -1,0 +1,10 @@
+---
+
+# https://github.com/pandora-analysis/pandora/blob/main/config/disclaimer.tmpl.sample
+- name: Add Custom disclaimer
+      ansible.builtin.lineinfile:
+        path: "{{ pandora_root }}/config/disclaimer.tmpl.sample"
+        mode: '0644'
+        insertbefore: BOF
+        regexp: '^{{ pandora_disclaimer_header }}'
+        line: "{{ pandora_disclaimer_header }}"

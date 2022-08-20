@@ -17,6 +17,8 @@ pandora_email_to: ["Investigation Team <investigation_unit@myorg.local>"]
 pandora_email_from: "Pandora <pandora@myorg.local>"
 # turn false to disable recent tasks access
 pandora_recent_tasks: true
+# Custom header disclaimer
+pandora_disclaimer_header: ''
 
 # delete files older than 30 days
 pandora_purge_enabled: true
