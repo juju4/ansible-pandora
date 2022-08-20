@@ -15,6 +15,16 @@ pandora_email_smtp_host: localhost
 pandora_email_smtp_port: 25
 pandora_email_to: ["Investigation Team <investigation_unit@myorg.local>"]
 pandora_email_from: "Pandora <pandora@myorg.local>"
+# imap fetcher
+pandora_imap_fetcher_enable: false
+pandora_imap_server: mail.myimap.server
+pandora_imap_login: "me@myimap.server"
+pandora_imap_password: "password"
+pandora_imap_folder: "Inbox"
+pandora_imap_smtp_server: "mail.mysmtp.server"
+pandora_imap_smtp_port: 25
+pandora_imap_smtp_requires_login: false
+pandora_imap_from: "Pandora <pandora@myorg.server>"
 # turn false to disable recent tasks access
 pandora_recent_tasks: true
 # Custom header disclaimer

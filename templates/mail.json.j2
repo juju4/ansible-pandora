@@ -1,0 +1,20 @@
+{
+    "imap_server": "{{ pandora_imap_server }}",
+    "imap_login": "{{ pandora_imap_login }}",
+    "imap_password": "{{ pandora_imap_password }}",
+    "imap_folder": "{{ pandora_imap_folder }}",
+    "smtp_server": "{{ pandora_imap_smtp_server }}"
+    "smtp_port": {{ pandora_imap_smtp_port }},
+    "smtp_requires_login": {{ pandora_imap_smtp_requires_login | bool | lower }},
+    "from": "{{ pandora_imap_from }}",
+    "_nodes": {
+        "imap_server": "IMAP server to fetch the mails from",
+        "imap_login": "Login on that IMAP server",
+        "imap_password": "Password in that IMAP server",
+        "imap_folder": "Folder where the script will look at unseen messages",
+        "smtp_server": "SMTP server to use to send replies",
+        "smtp_port": "SMTP port of the SMTP server",
+        "smtp_requires_login": "set to true if the SMTP server requires a login, it will use the imap credentials",
+        "from": "Email address for the replies"
+    }
+}

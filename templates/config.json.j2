@@ -11,7 +11,7 @@
     "sample_password": "infected",
     "lookyloo_url": "{{ pandora_lookyloo_url }}",
     "users": {},
-    "enable_imap_fetcher": false,
+    "enable_imap_fetcher": {{ pandora_imap_fetcher_enable | bool }},
     "channels": {
         "enabled": false,
         "channel_submission": "pandora_submissions"

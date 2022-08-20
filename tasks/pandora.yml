@@ -126,6 +126,15 @@
     - { s: dist/dropzone.css, d: css/lib/dropzone.css }
     - { s: "moment-{{ pandora_moment_version }}/min/moment-with-locales.min.js", d: js/lib/moment-with-locales.min.js }
 
+- name: Ensure mail.json is configured for imap fetcher
+  ansible.builtin.template:
+    src: mail.json.j2
+    dest: "{{ pandora_root }}/config/mail.json"
+    mode: '0644'
+    owner: "{{ pandora_user }}"
+    backup: "{{ pandora_backup }}"
+  when: pandora_imap_fetcher_enable|bool
+
 - import_tasks: recent_tasks.yml
   when: pandora_recent_tasks|bool
 
