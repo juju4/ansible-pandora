@@ -37,7 +37,7 @@ https://docs.microsoft.com/en-us/azure/digital-twins/how-to-create-app-registrat
 ```
 # create
 az ad app create --display-name TOKEN_NAME --available-to-other-tenants false --reply-urls http://localhost --native-app false --credential-description "DESCRIPTION"
-az ad app credential reset --id <appid per previous outpout> --append
+az ad app credential reset --id <appid per previous output> --append
 Connect-AzureAD
 New-AzureADServicePrincipal -AccountEnabled $true -AppId "<appid per previous outpout>" -AppRoleAssignmentRequired $true -DisplayName "TOKEN_NAME" -Tags {WindowsAzureActiveDirectoryIntegratedApp}
 # validate
