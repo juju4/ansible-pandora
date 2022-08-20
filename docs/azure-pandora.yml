@@ -132,28 +132,36 @@
         direction: Outbound
         source_address_prefix: "*"
         destination_address_prefix: "{{ dns_host_address | default('*') }}"
+      - name: Submission-Tcp-Out
+        protocol: Tcp
+        destination_port_range: 587
+        access: Allow
+        priority: 2002
+        direction: Outbound
+        source_address_prefix: "*"
+        destination_address_prefix: "{{ smtp_host_address | default('*') }}"
+      # nsg is stateful, prevent connection if not initiated by client
+      - name: DenyAllOutBound-PrivateIP
+        destination_port_range: "*"
+        access: Deny
+        priority: 2010
+        direction: Outbound
+        source_address_prefix: "*"
+        destination_address_prefix: "10.0.0.0/8"
       - name: HTTPS-Out
         protocol: Tcp
         destination_port_range: 443
         access: Allow
-        priority: 2002
+        priority: 2012
         direction: Outbound
         source_address_prefix: "*"
       - name: HTTP-Out
         protocol: Tcp
         destination_port_range: 80
         access: Allow
-        priority: 2003
+        priority: 2013
         direction: Outbound
         source_address_prefix: "*"
-      - name: Submission-Tcp-Out
-        protocol: Tcp
-        destination_port_range: 587
-        access: Allow
-        priority: 3000
-        direction: Outbound
-        source_address_prefix: "*"
-        destination_address_prefix: "{{ smtp_host_address | default('*') }}"
       - name: DenyAllOutBound-early
         destination_port_range: "*"
         access: Deny
@@ -509,6 +517,7 @@
     #   - { src: 'LABEL=cloudimg-rootfs', path: /, fstype: ext4, opts: "discard,errors=remount-ro,acl", state: remounted }
     #   - { src: /dev/vda1, path: /, fstype: ext4, opts: "discard,errors=remount-ro,acl", state: remounted }
     hardenwebserver_http_redirect_to_https: true
+    harden_nginx_client_max_body_size: 30m
     hardenwebserver_nginx_https_server_include:
       - { name: pandora, src: pandora-nginx.j2 }
     hardenwebserver_systemd_dir_acl:
