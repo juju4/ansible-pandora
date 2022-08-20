@@ -1,28 +1,26 @@
 {{ ansible_managed | comment }}
 #
-# /etc/systemd/system/pandora.service
-# Exposure level 2.3
+# /etc/systemd/system/pandora-unoserver.service
+# Exposure level 1.9
 #
 [Unit]
-Description=Pandora Analysis service
+Description=Pandora Analysis unoserver service
 Requires=network.target
 
 [Service]
-Type=forking
-# Type=simple
-# ExecStart=/bin/sh -c "{{ poetry_root }}/bin/poetry run update --yes"
-ExecStart=/bin/sh -c "{{ poetry_root }}/bin/poetry run start"
-ExecStop=/bin/sh -c "{{ poetry_root }}/bin/poetry run stop"
+# https://github.com/unoconv/unoserver/issues/12
+ExecStart={{ venv_pandora.stdout }}/unoserver
+Environment=PYTHONUNBUFFERED=true
 WorkingDirectory={{ pandora_root }}/bin
-# Restart=always
-RestartSec=15
-SyslogIdentifier=pandora
+Restart=on-failure
+RestartSec=60
+SyslogIdentifier=pandora-unoserver
 # (code=exited, status=209/STDOUT)
 # StandardOutput=append:/var/log/pandora/message.log
 # StandardError=append:/var/log/pandora/error.log
 User={{ pandora_user }}
 Group={{ pandora_user }}
-Environment=PATH=/usr/sbin:/usr/bin:/sbin:/bin:{{ poetry_root }}/bin
+Environment=PATH={{ venv_pandora.stdout }}:/usr/sbin:/usr/bin:/sbin:/bin:{{ poetry_root }}/bin
 
 # Reduce Attack Surface
 NoNewPrivileges=yes

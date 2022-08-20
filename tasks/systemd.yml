@@ -5,34 +5,33 @@
     name: systemd
     state: present
 
-- name: Ensure override folder exists
-  ansible.builtin.file:
-    dest: /etc/systemd/system/kvrocks.service.d
-    state: directory
-    mode: '0755'
-  when: false
+- name: Ensure redis does not daemonize
+  ansible.builtin.replace:
+    dest: "{{ pandora_root }}/cache/cache.conf"
+    regexp: "^daemonize .*"
+    replace: "daemonize no"
+    mode: '0644'
+    owner: "{{ pandora_user }}"
+    backup: "{{ pandora_backup }}"
+  notify:
+    - restart pandora-redis
 
-- name: Review kvrocks systemd options
+- name: Configure pandora systemd units
   ansible.builtin.template:
-    src: systemd-override-kvrocks.conf.j2
-    dest: /etc/systemd/system/kvrocks.service.d/hardening.conf
+    src: "systemd-{{ item }}.service.j2"
+    dest: "/etc/systemd/system/{{ item }}.service"
     mode: '0644'
   notify:
     - reload systemd
-    - restart kvrocks
-  when: false
+    - "restart {{ item }}"
+  loop: "{{ pandora_systemd_units }}"
 
-- name: Configure pandora systemd unit
-  ansible.builtin.template:
-    src: systemd-pandora.service.j2
-    dest: /etc/systemd/system/pandora.service
-    mode: '0644'
-  notify:
-    - reload systemd
-    - restart pandora
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers
 
-- name: Enable and start pandora service
+- name: Enable and start pandora services
   ansible.builtin.service:
-    name: pandora
+    name: "{{ item }}"
     state: started
     enabled: yes
+  loop: "{{ pandora_systemd_units }}"

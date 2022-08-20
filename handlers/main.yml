@@ -10,9 +10,9 @@
           (ansible_virtualization_type == "docker" or ansible_virtualization_type == "containerd")
         )
 
-- name: restart kvrocks
+- name: restart pandora-kvrocks
   ansible.builtin.service:
-    name: kvrocks
+    name: pandora-kvrocks
     state: restarted
   become: yes
   become_user: root
@@ -21,9 +21,53 @@
           (ansible_virtualization_type == "docker" or ansible_virtualization_type == "containerd")
         )
 
-- name: restart pandora
+- name: restart pandora-redis
   ansible.builtin.service:
-    name: pandora
+    name: pandora-redis
+    state: restarted
+  become: yes
+  become_user: root
+  when: >
+    not (ansible_virtualization_type is defined and
+          (ansible_virtualization_type == "docker" or ansible_virtualization_type == "containerd")
+        )
+
+- name: restart pandora-unoserver
+  ansible.builtin.service:
+    name: pandora-unoserver
+    state: restarted
+  become: yes
+  become_user: root
+  when: >
+    not (ansible_virtualization_type is defined and
+          (ansible_virtualization_type == "docker" or ansible_virtualization_type == "containerd")
+        )
+
+- name: restart pandora-workers
+  ansible.builtin.service:
+    name: pandora-workers
+    state: restarted
+  become: yes
+  become_user: root
+  when: >
+    not (ansible_virtualization_type is defined and
+          (ansible_virtualization_type == "docker" or ansible_virtualization_type == "containerd")
+        )
+
+- name: restart pandora-imap_fetcher
+  ansible.builtin.service:
+    name: pandora-imap_fetcher
+    state: restarted
+  become: yes
+  become_user: root
+  when: >
+    not (ansible_virtualization_type is defined and
+          (ansible_virtualization_type == "docker" or ansible_virtualization_type == "containerd")
+        )
+
+- name: restart pandora-web
+  ansible.builtin.service:
+    name: pandora-web
     state: restarted
   become: yes
   become_user: root

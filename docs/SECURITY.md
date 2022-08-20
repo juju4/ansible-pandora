@@ -64,6 +64,9 @@ Possible option to use with a reverse proxy: https://github.com/vouch/vouch-prox
 ### System
 
 * Systemd hardening with seccomp, capabilities.
+* Split services under multiple systemd units - [The systemd house of horror](https://jdebp.uk/FGA/systemd-house-of-horror/)
+  * different level of privilege, system hardening
+  * eventually separating between different hosts or containers aka multi-tiers architecture
 * hardening roles: juju4.harden, juju4.osquery, juju4.falco
 * Azure
   * Microsoft.GuestConfiguration VM extension
@@ -126,10 +129,6 @@ https://github.com/pandora-analysis/pandora/tree/main/.github/workflows
 
 ## Improvements
 
-* Split service under multiple systemd units allowing
-  * different user
-  * different level of privilege, system hardening
-  * separating between different hosts aka three-tier architecture, at least redis part
 * Use web proxy with TLS inspection
 * App code scanning
 * Document requirements for source-built redis and kvrocks vs upstream packages

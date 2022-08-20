@@ -23,6 +23,13 @@ pandora_purge_enabled: true
 pandora_purge_mtime: +30
 
 pandora_cgroups_restriction_enable: true
+pandora_systemd_units:
+  - pandora-imap_fetcher
+  - pandora-kvrocks
+  - pandora-redis
+  - pandora-unoserver
+  - pandora-web
+  - pandora-workers
 
 # workers settings
 # pandora_hybridanalysis_apikey: 'null'

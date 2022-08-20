@@ -22,6 +22,12 @@
   register: poetry_install
   changed_when: "'No dependencies to install or update' not in poetry_install.stdout"
 
+- name: Get pandora poetry virtualenv bin path
+  ansible.builtin.command: find /var/_pandora/.cache/pypoetry/virtualenvs/ -maxdepth 2 -type d -ipath '*/bin'
+  register: venv_pandora
+  changed_when: false
+  failed_when: venv_pandora.rc != 0
+
 - name: Ensure .env is configured
   ansible.builtin.copy:
     dest: "{{ pandora_root }}/.env"
@@ -46,8 +52,6 @@
     mode: '0755'
     owner: "{{ pandora_user }}"
     backup: "{{ pandora_backup }}"
-  notify:
-    - restart pandora
 
 - name: Ensure kvrocks binding on localhost
   ansible.builtin.replace:
@@ -58,8 +62,7 @@
     owner: "{{ pandora_user }}"
     backup: "{{ pandora_backup }}"
   notify:
-    - restart pandora
-  when: false
+    - restart pandora-kvrocks
 
 - name: Ensure web/static lib dir exists
   ansible.builtin.file:
