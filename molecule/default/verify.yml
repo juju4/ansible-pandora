@@ -24,7 +24,7 @@
     - name: Debug | var ansible_virtualization_type
       ansible.builtin.debug: var=ansible_virtualization_type
     - name: Set fact is_container
-      set_fact:
+      ansible.builtin.set_fact:
         is_container: true
       when: >
         (ansible_virtualization_type is defined and
