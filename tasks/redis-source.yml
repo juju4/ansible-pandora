@@ -9,7 +9,7 @@
   become: yes
   become_user: root
 
-- name: clone redis repository
+- name: Clone redis repository
   ansible.builtin.git:
     repo: https://github.com/redis/redis.git
     dest: "{{ pandora_home }}/redis"
@@ -17,7 +17,7 @@
   become: yes
   become_user: "{{ pandora_user }}"
 
-- name: build redis
+- name: Build redis
   ansible.builtin.command: make
   args:
     chdir: "{{ pandora_home }}/redis"

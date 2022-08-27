@@ -4,7 +4,7 @@
 # git config --global --add safe.directory /var/_pandora/pandora
 # but can't update as pandora_user
 # chown -R _pandora /var/_pandora/pandora
-- name: git clone repository
+- name: Git clone repository
   ansible.builtin.git:
     repo: https://github.com/pandora-analysis/pandora.git
     dest: "{{ pandora_root }}"

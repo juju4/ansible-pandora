@@ -46,7 +46,7 @@
     (ansible_virtualization_type == "docker" or ansible_virtualization_type == "containerd")
     )
 
-- name: ensure pandora user exists
+- name: Ensure pandora user exists
   ansible.builtin.user:
     name: "{{ pandora_user }}"
     home: "{{ pandora_home }}"

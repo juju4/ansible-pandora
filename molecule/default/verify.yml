@@ -90,7 +90,7 @@
       when:
         - not is_container|bool
 
-    - name: check all processes
+    - name: Check all processes
       ansible.builtin.command: ps aux
       changed_when: false
       register: psa

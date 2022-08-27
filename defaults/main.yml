@@ -69,8 +69,8 @@ pandora_web_static:
       c: 'sha256:6ea55ea86749ee1fe560fabac6b3effd81b33046fa74dc657e24d41d28110a9f'
   }
   # 404
-  # - { u: 'https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.css',
-  #     d: 'css/lib/bootstrap-datepicker.min.css',
+  # - { u: 'https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.css',
+  #     d: 'css/lib/bootstrap-datepicker.min.css',
   #     c: 'sha256:xxx'
   # }
   - { u: 'https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css',

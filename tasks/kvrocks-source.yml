@@ -16,7 +16,7 @@
   become: yes
   become_user: root
 
-- name: clone kvrocks repository
+- name: Clone kvrocks repository
   ansible.builtin.git:
     repo: https://github.com/apache/incubator-kvrocks.git
     dest: "{{ pandora_home }}/kvrocks"
@@ -24,7 +24,7 @@
   become: yes
   become_user: "{{ pandora_user }}"
 
-- name: build kvrocks
+- name: Build kvrocks
   ansible.builtin.command: make -j4
   args:
     chdir: "{{ pandora_home }}/kvrocks"

@@ -1,6 +1,6 @@
 ---
 
-- name: reload systemd
+- name: Reload systemd
   ansible.builtin.systemd:
     daemon_reload: yes
   become: yes
@@ -10,7 +10,7 @@
           (ansible_virtualization_type == "docker" or ansible_virtualization_type == "containerd")
         )
 
-- name: restart pandora-kvrocks
+- name: Restart pandora-kvrocks
   ansible.builtin.service:
     name: pandora-kvrocks
     state: restarted
@@ -21,7 +21,7 @@
           (ansible_virtualization_type == "docker" or ansible_virtualization_type == "containerd")
         )
 
-- name: restart pandora-redis
+- name: Restart pandora-redis
   ansible.builtin.service:
     name: pandora-redis
     state: restarted
@@ -32,7 +32,7 @@
           (ansible_virtualization_type == "docker" or ansible_virtualization_type == "containerd")
         )
 
-- name: restart pandora-unoserver
+- name: Restart pandora-unoserver
   ansible.builtin.service:
     name: pandora-unoserver
     state: restarted
@@ -43,7 +43,7 @@
           (ansible_virtualization_type == "docker" or ansible_virtualization_type == "containerd")
         )
 
-- name: restart pandora-workers
+- name: Restart pandora-workers
   ansible.builtin.service:
     name: pandora-workers
     state: restarted
@@ -54,7 +54,7 @@
           (ansible_virtualization_type == "docker" or ansible_virtualization_type == "containerd")
         )
 
-- name: restart pandora-imap_fetcher
+- name: Restart pandora-imap_fetcher
   ansible.builtin.service:
     name: pandora-imap_fetcher
     state: restarted
@@ -65,7 +65,7 @@
           (ansible_virtualization_type == "docker" or ansible_virtualization_type == "containerd")
         )
 
-- name: restart pandora-web
+- name: Restart pandora-web
   ansible.builtin.service:
     name: pandora-web
     state: restarted
@@ -87,7 +87,7 @@
           (ansible_virtualization_type == "docker" or ansible_virtualization_type == "containerd")
         )
 
-- name: refresh apparmor libreoffice
+- name: Refresh apparmor libreoffice
   ansible.builtin.command: aa-enforce /etc/apparmor.d/usr.lib.libreoffice*
   become: yes
   become_user: root
