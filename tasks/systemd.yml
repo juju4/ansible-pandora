@@ -14,7 +14,7 @@
     owner: "{{ pandora_user }}"
     backup: "{{ pandora_backup }}"
   notify:
-    - restart pandora-redis
+    - Restart pandora-redis
 
 - name: Configure pandora systemd units
   ansible.builtin.template:
@@ -22,8 +22,8 @@
     dest: "/etc/systemd/system/{{ item }}.service"
     mode: '0644'
   notify:
-    - reload systemd
-    - "restart {{ item }}"
+    - Reload systemd
+    - "Restart {{ item }}"
   loop: "{{ pandora_systemd_units }}"
 
 - name: Flush handlers

@@ -62,7 +62,7 @@
     owner: "{{ pandora_user }}"
     backup: "{{ pandora_backup }}"
   notify:
-    - restart pandora-kvrocks
+    - Restart pandora-kvrocks
 
 - name: Ensure web/static lib dir exists
   ansible.builtin.file:
