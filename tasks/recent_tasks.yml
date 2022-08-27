@@ -6,7 +6,7 @@
     mode: '0644'
     marker: "# ANSIBLE MANAGED BLOCK - recent tasks"
     state: absent
-  when: pandora_recent_tasks|bool
+  when: pandora_recent_tasks | bool
 
 - name: Disable Recent Tasks page availability
   ansible.builtin.blockinfile:
@@ -18,4 +18,4 @@
       # ensure correct indent
           return redirect(url_for('api_root'), 302)
     backup: yes
-  when: not pandora_recent_tasks|bool
+  when: not pandora_recent_tasks | bool

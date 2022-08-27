@@ -135,3 +135,5 @@ pandora_ufw_allow_ports_out:
   # - '67'
 
 pandora_ufw_allow_if_out: []
+
+is_container: false

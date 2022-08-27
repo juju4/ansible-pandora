@@ -133,13 +133,13 @@
     mode: '0644'
     owner: "{{ pandora_user }}"
     backup: "{{ pandora_backup }}"
-  when: pandora_imap_fetcher_enable|bool
+  when: pandora_imap_fetcher_enable | bool
 
 - import_tasks: recent_tasks.yml
-  when: pandora_recent_tasks|bool
+  when: pandora_recent_tasks | bool
 
 - import_tasks: disclaimer.yml
-  when: pandora_disclaimer_header|string
+  when: pandora_disclaimer_header | string
 
 - import_tasks: purge.yml
-  when: pandora_purge_enabled|bool
+  when: pandora_purge_enabled | bool

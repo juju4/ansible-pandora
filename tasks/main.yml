@@ -4,6 +4,14 @@
   ansible.builtin.include_vars: "{{ ansible_distribution }}-{{ ansible_distribution_version }}.yml"
   when: ansible_distribution == 'Ubuntu'
 
+- name: Set fact is_container
+  ansible.builtin.set_fact:
+    is_container: true
+  when: >
+    (ansible_virtualization_type is defined and
+      (ansible_virtualization_type == "docker" or ansible_virtualization_type == "containerd")
+    )
+
 - name: Ensure archives folder exists
   ansible.builtin.file:
     dest: "{{ install_archives }}"
@@ -41,10 +49,8 @@
   loop: "{{ pandora_fstab }}"
   become: yes
   become_user: root
-  when: >
-    not (ansible_virtualization_type is defined and
-    (ansible_virtualization_type == "docker" or ansible_virtualization_type == "containerd")
-    )
+  when:
+    - not is_container
 
 - name: Ensure pandora user exists
   ansible.builtin.user:
@@ -101,14 +107,10 @@
   become_user: root
   when:
     - pandora_ufw|bool
-    - not (ansible_virtualization_type is defined and
-          (ansible_virtualization_type == "docker" or ansible_virtualization_type == "containerd")
-        )
+    - not is_container
 
 - import_tasks: systemd.yml
   become: yes
   become_user: root
-  when: >
-    not (ansible_virtualization_type is defined and
-          (ansible_virtualization_type == "docker" or ansible_virtualization_type == "containerd")
-    )
+  when:
+    - not is_container
