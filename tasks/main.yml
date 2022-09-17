@@ -88,6 +88,7 @@
 
 - import_tasks: pandora.yml
   become: yes
+  become_flags: -H
   become_user: "{{ pandora_user }}"
 
 - import_tasks: workers.yml
