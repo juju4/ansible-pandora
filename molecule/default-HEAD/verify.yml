@@ -1,0 +1,131 @@
+---
+
+- name: Verify
+  hosts: pandora
+  gather_facts: true
+  vars:
+    pandora_home: /var/_pandora
+    pandora_start: "{{ pandora_home }}/pandora/bin/start.py"
+    binary_redis: "{{ pandora_home }}/redis/src/redis-server"
+    binary_kvrocks: "{{ pandora_home }}/kvrocks/src/kvrocks"
+    config: "{{ pandora_home }}/pandora/config/generic.json"
+    ports:
+      # kvrocks
+      - { h: localhost, p: 6101 }
+      # redis: socket only
+      # - { h: localhost, p: 6379 }
+      # soffice
+      - { h: localhost, p: 2002 }
+      # gunicorn
+      - { h: 0.0.0.0, p: 6100 }
+    url: http://localhost:6100
+    is_container: false
+  pre_tasks:
+    - name: Debug | var ansible_virtualization_type
+      ansible.builtin.debug: var=ansible_virtualization_type
+    - name: Set fact is_container
+      ansible.builtin.set_fact:
+        is_container: true
+      when: >
+        (ansible_virtualization_type is defined and
+          (ansible_virtualization_type == "docker" or ansible_virtualization_type == "containerd")
+        )
+  tasks:
+    - name: Gather package facts
+      ansible.builtin.package_facts:
+        manager: auto
+    - name: Validate that needed packages are present
+      ansible.builtin.assert:
+        that: ansible_facts.packages['libreoffice-base-nogui']
+
+    - name: Check pandora start file
+      ansible.builtin.stat:
+        path: "{{ pandora_start }}"
+      register: bin1
+    - name: Validate pandora start.py is present
+      ansible.builtin.assert:
+        that: bin1.stat.exists and bin1.stat.size != 0 and bin1.stat.mode == '0775'
+
+    - name: Check redis file
+      ansible.builtin.stat:
+        path: "{{ binary_redis }}"
+      register: bin2
+    - name: Validate redis binary is present
+      ansible.builtin.assert:
+        that: bin2.stat.exists and bin2.stat.size != 0 and bin2.stat.mode == '0775'
+
+    - name: Check kvrocks file
+      ansible.builtin.stat:
+        path: "{{ binary_kvrocks }}"
+      register: bin3
+    - name: Validate kvrocks binary is present
+      ansible.builtin.assert:
+        that: bin3.stat.exists and bin3.stat.size != 0 and bin3.stat.mode == '0775'
+
+    - name: Check pandora config file
+      ansible.builtin.stat:
+        path: "{{ config }}"
+      register: cfg1
+    - name: Validate pandora configuration files are present
+      ansible.builtin.assert:
+        that: cfg1.stat.exists and cfg1.stat.size != 0
+
+    - name: Ensure clamd socket is present
+      ansible.builtin.stat:
+        path: /var/run/clamav/clamd.ctl
+      register: ctl
+    - name: Validate clamd socket present
+      ansible.builtin.assert:
+        that: ctl.stat.exists and ctl.stat.issock
+      failed_when: false
+
+    - name: Ensure pandora processes are running
+      ansible.builtin.shell: pgrep -u _pandora python || pgrep -u _pandora gunicorn
+      register: ps3
+      changed_when: false
+      failed_when: false
+    - name: Validate ps output
+      ansible.builtin.assert:
+        that: ps3.stdout
+      when:
+        - not is_container|bool
+
+    - name: Check all processes
+      ansible.builtin.command: ps aux
+      changed_when: false
+      register: psa
+    - name: Debug | ps aux output
+      ansible.builtin.debug: var=psa verbosity=1
+
+    - name: Get stats of redis cache socket
+      ansible.builtin.stat:
+        path: "{{ pandora_home }}/pandora/cache/cache.sock"
+      register: st
+    - name: Validate redis cache socket is present
+      ansible.builtin.assert:
+        that: st.stat.exists and st.stat.issock
+      when:
+        - not is_container|bool
+
+    - name: Ensure ports are listening
+      ansible.builtin.wait_for:
+        host: "{{ item.h }}"
+        port: "{{ item.p }}"
+        timeout: 10
+      with_items: "{{ ports }}"
+      when:
+        - not is_container|bool
+
+    - name: Fetch localhost endpoint
+      ansible.builtin.uri:
+        url: "{{ url }}"
+        validate_certs: no
+        return_content: yes
+      register: web
+      failed_when: false
+    - name: Validate localhost endpoint
+      ansible.builtin.assert:
+        that: >
+          "'pandora' in web.content"
+      when:
+        - not is_container|bool
