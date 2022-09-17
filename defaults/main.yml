@@ -6,6 +6,8 @@ pandora_user: _pandora
 pandora_home: /var/_pandora
 pandora_root: "{{ pandora_home }}/pandora"
 poetry_root: /usr/local/share/poetry
+pandora_poetry_version: 1.2.1
+pandora_poetry_system_git: true
 
 pandora_listen_ip: 0.0.0.0
 pandora_listen_port: 6100

@@ -73,6 +73,38 @@ Possibly related to systemd hardening or some missing components.
 This happens in GitHub action and only on Ubuntu 22.04
 It has not been reproducible locally.
 
+* poetry 1.2.1 seems to introduce a regression with dulwich module
+```
+         "",
+        "  HangupException",
+        "",
+        "  The remote server unexpectedly closed the connection.",
+        "",
+        "  at /usr/local/share/poetry/venv/lib/python3.8/site-packages/dulwich/protocol.py:232 in read_pkt_line",
+        "      228│ ",
+        "      229│         try:",
+        "      230│             sizestr = read(4)",
+        "      231│             if not sizestr:",
+        "    → 232│                 raise HangupException()",
+        "      233│             size = int(sizestr, 16)",
+        "      234│             if size == 0:",
+        "      235│                 if self.report_activity:",
+        "      236│                     self.report_activity(4, \"read\")",
+        "",
+        "The following error occurred when trying to handle this error:",
+        "",
+        "",
+        "  HangupException",
+        "",
+        "  ssh: Could not resolve hostname https: Temporary failure in name resolution",
+        "",
+        "  at /usr/local/share/poetry/venv/lib/python3.8/site-packages/dulwich/client.py:1151 in fetch_pack",
+```
+https://github.com/python-poetry/poetry/issues/6329
+https://github.com/python-poetry/poetry/issues/6428
+https://github.com/jelmer/dulwich/issues/1032
+Normally fixed in upstream dulwich 0.20.46 but still seeing occurrence. As workaround, either revert to poetry 1.1.15, either force use of system git.
+
 ## License
 
 BSD 2-clause

@@ -12,6 +12,23 @@
     update: no
     force: no
 
+- name: Poetry | check system git config
+  ansible.builtin.command: "poetry config experimental.system-git-client"
+  args:
+    chdir: "{{ pandora_root }}"
+  environment:
+    PATH: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:{{ poetry_root }}/bin"
+  changed_when: false
+  register: poetry_git_sys
+
+- name: Poetry | use system git
+  ansible.builtin.command: "poetry config experimental.system-git-client {{ pandora_poetry_system_git | bool | lower }} --local"
+  args:
+    chdir: "{{ pandora_root }}"
+  environment:
+    PATH: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:{{ poetry_root }}/bin"
+  when: poetry_git_sys.stdout != pandora_poetry_system_git | bool | lower
+
 - name: Install pandora
   ansible.builtin.command: poetry install
   args:
