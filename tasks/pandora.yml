@@ -26,6 +26,7 @@
     chdir: "{{ pandora_root }}"
   environment:
     PATH: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:{{ poetry_root }}/bin"
+    XDG_CONFIG_HOME: "/home/{{ pandora_user }}/.config"
   changed_when: false
   register: poetry_git_sys
 
@@ -35,6 +36,7 @@
     chdir: "{{ pandora_root }}"
   environment:
     PATH: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:{{ poetry_root }}/bin"
+    XDG_CONFIG_HOME: "/home/{{ pandora_user }}/.config"
   when: poetry_git_sys.stdout != pandora_poetry_system_git | bool | lower
 
 - name: Install pandora
@@ -44,6 +46,7 @@
     # creates: "{{ pandora_root }}/.cache/pypoetry/virtualenvs/pandora-<RANDOM>-py3.10/bin/weasyprint"
   environment:
     PATH: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:{{ poetry_root }}/bin"
+    XDG_CONFIG_HOME: "/home/{{ pandora_user }}/.config"
   register: poetry_install
   changed_when: "'No dependencies to install or update' not in poetry_install.stdout"
 
