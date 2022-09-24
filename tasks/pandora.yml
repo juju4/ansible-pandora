@@ -12,6 +12,14 @@
     update: no
     force: no
 
+- name: Debug
+  ansible.builtin.command: "{{ item }}"
+  loop:
+    - whoami
+    - env
+    - ls -l $HOME/.config/
+  changed_when: false
+
 - name: Poetry | check system git config
   ansible.builtin.command: "poetry config experimental.system-git-client"
   args:
