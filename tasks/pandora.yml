@@ -46,9 +46,9 @@
   failed_when: venv_pandora.rc != 0
 
 - name: Ensure .env is configured
-  ansible.builtin.copy:
+  ansible.builtin.template:
+    src: env.j2
     dest: "{{ pandora_root }}/.env"
-    content: "PANDORA_HOME=\"{{ pandora_root }}\""
     mode: '0644'
     owner: "{{ pandora_user }}"
     backup: "{{ pandora_backup }}"

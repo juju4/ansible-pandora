@@ -36,7 +36,7 @@
     to_port: "{{ item }}"
   with_items: "{{ pandora_ufw_allow_ports_in }}"
 
-- name: UFW | allow {{ pandora_ufw_if }} outgoing traffic for defined ports
+- name: UFW | allow outgoing traffic for defined ports - {{ pandora_ufw_if }}
   community.general.ufw:
     rule: allow
     interface: "{{ pandora_ufw_if }}"
