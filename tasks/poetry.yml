@@ -14,7 +14,7 @@
 
 - name: Download install-poetry.py
   ansible.builtin.get_url:
-    url: https://install.python-poetry.org
+    url: "https://raw.githubusercontent.com/python-poetry/install.python-poetry.org/{{ pandora_poetry_install_version }}/install-poetry.py"
     dest: "{{ install_archives }}/install-poetry.py"
     mode: '0755'
     checksum: "{{ pandora_poetry_hash }}"

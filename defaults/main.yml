@@ -1,7 +1,8 @@
 ---
 
 pandora_version: c3770856ed4849e6491b796f700598d2972d3ffa
-pandora_poetry_hash: 'sha256:4625472cd05e32e1414b0501d12d021d3f2e4aaf81582656f577caf1566871cc'
+pandora_poetry_install_version: e8d8f76750e1abaebd628e2323a49163d102c9d6
+pandora_poetry_hash: 'sha256:08a38ab8de719d4012af4d62c37ce09e84edce6e1c4da7c5ccbcade359312c8b'
 pandora_user: _pandora
 pandora_home: /var/_pandora
 pandora_root: "{{ pandora_home }}/pandora"

@@ -8,6 +8,7 @@
   remote_user: root
   vars:
     pandora_version: HEAD
+    pandora_poetry_install_version: HEAD
     pandora_poetry_version: ''
   pre_tasks:
     - name: Ubuntu | Install python3
