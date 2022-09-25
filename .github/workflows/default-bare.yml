@@ -17,7 +17,7 @@ jobs:
       matrix:
         include:
           - os: ubuntu-22.04
-            experimental: true
+            experimental: false
           - os: ubuntu-20.04
             experimental: false
     env:
