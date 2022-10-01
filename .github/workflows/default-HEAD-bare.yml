@@ -4,8 +4,8 @@ name: default-HEAD-bare
 on:
   push:
   pull_request:
-  schedule:  # run weekly, every Tuesday 03:00
-    - cron: '0 3 * * 2'
+  schedule:  # run weekly, every Thursday 01:00
+    - cron: '40 1 * * 4'
 
 jobs:
   build:
