@@ -41,7 +41,6 @@
     # Networking with existing private IP virtual network and subnet that is peered on an express route
     # (leave empty if not using else will take priority)
     # using resourceid as different resource group as NIC
-    # target_vnet_name: EUS-SIO-Playground-Vnet-10-56-78-128-26
     # 'Microsoft.Network/virtualNetworks/subnets/join/action' permission needed ~ Network Contributor
     target_vnet_name: ''
     # target_vnet_name: /subscriptions/GUID/resourceGroups/RG/providers/Microsoft.Network/virtualNetworks/VNET
@@ -180,7 +179,7 @@
     - azure.azcollection
     - community.azure
   handlers:
-    - name: wait a bit if vm state changed to ensure system is up
+    - name: Wait a bit if vm state changed to ensure system is up
       ansible.builtin.pause: seconds=5
   tasks:
     # General
@@ -196,7 +195,7 @@
         name: "{{ base_name }}vn001"
         address_prefixes: "{{ base_vn }}"
         tags: "{{ azure_tags }}"
-      when: not target_vnet_name|string
+      when: not target_vnet_name | string
 
     - name: Add subnet
       azure.azcollection.azure_rm_subnet:
@@ -204,9 +203,10 @@
         name: "{{ base_name }}subnet001"
         address_prefix: "{{ base_subnet }}"
         virtual_network: "{{ base_name }}vn001"
-      when: not (target_vnet_name|string and target_subnet_name|string)
+      when: not (target_vnet_name | string and target_subnet_name | string)
 
     - name: Azure Bastion
+      when: azurebastion | bool
       block:
         # https://docs.microsoft.com/en-us/azure/bastion/bastion-create-host-portal
         # Bastion will require RSA private key or password
@@ -235,7 +235,6 @@
                 value: "{{ azure_location }}"
             template_link: 'https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/101-azure-bastion/azuredeploy.json'
           register: azurebastion
-      when: azurebastion|bool
 
     - name: Create network security group
       azure.azcollection.azure_rm_securitygroup:
@@ -250,9 +249,8 @@
         resource_group: "{{ base_rg }}"
         name: "{{ base_name }}PublicIP0"
         allocation_method: Static
-        tags:
-          role: "Linux VM0"
-      when: not (target_vnet_name|string and target_subnet_name|string)
+        tags: "{{ azure_tags }}"
+      when: not (target_vnet_name | string and target_subnet_name | string)
 
     - name: Create VM NIC - public ip
       azure.azcollection.azure_rm_networkinterface:
@@ -264,7 +262,7 @@
         ip_configurations:
           - name: ipconfig1
             public_ip_address_name: "{{ base_name }}PublicIP0"
-      when: not (target_vnet_name|string and target_subnet_name|string)
+      when: not (target_vnet_name | string and target_subnet_name | string)
 
     - name: Create VM NIC - existing given vnet
       azure.azcollection.azure_rm_networkinterface:
@@ -273,7 +271,7 @@
         virtual_network: "{{ target_vnet_name }}"
         subnet: "{{ target_subnet_name }}"
         security_group: "{{ base_name }}secgroup001"
-      when: (target_vnet_name|string and target_subnet_name|string)
+      when: (target_vnet_name | string and target_subnet_name | string)
 
     - name: Create VM virtual machine
       azure.azcollection.azure_rm_virtualmachine:
@@ -294,7 +292,7 @@
         tags: "{{ azure_tags }}"
       register: vmout
       notify:
-        - wait a bit if vm state changed to ensure system is up
+        - Wait a bit if vm state changed to ensure system is up
 
     - name: Get facts for VM
       azure.azcollection.azure_rm_virtualmachine_info:
@@ -306,13 +304,13 @@
     # - ansible.builtin.pause:
 
     - name: Set fact | VM public ip
-      set_fact:
+      ansible.builtin.set_fact:
         vm_ip: "{{ azure_vm.properties.networkProfile.networkInterfaces[0].properties.ipConfigurations[0].properties.publicIPAddress.properties.ipAddress }}"
-      when: not target_vnet_name|string
+      when: not target_vnet_name | string
     - name: Set fact | VM existing vnet ip
-      set_fact:
+      ansible.builtin.set_fact:
         vm_ip: "{{ azure_vm.properties.networkProfile.networkInterfaces[0].properties.ipConfigurations[0].properties.privateIPAddress }}"
-      when: target_vnet_name|string
+      when: target_vnet_name | string
 
     - name: Add instance to the host group
       ansible.builtin.add_host:
@@ -419,7 +417,7 @@
         resource_id: "{{ azure_vm.id }}"
         backup_policy_id: "{{ backuppolicy.id }}"
         state: 'create'
-      when: not recoverypoint.response.id|string
+      when: not recoverypoint.response.id | string
 
 - name: Add host to local ssh config for jumphost
   hosts: localhost
@@ -493,6 +491,8 @@
       ansible.builtin.package:  # noqa package-latest
         name: '*'
         state: latest
+      register: pkg_result
+      until: pkg_result
   roles:
     - juju4.adduser
     - juju4.tinyproxy
