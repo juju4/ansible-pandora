@@ -22,7 +22,8 @@
     is_container: false
   pre_tasks:
     - name: Debug | var ansible_virtualization_type
-      ansible.builtin.debug: var=ansible_virtualization_type
+      ansible.builtin.debug:
+        var: ansible_virtualization_type
     - name: Set fact is_container
       ansible.builtin.set_fact:
         is_container: true
@@ -95,7 +96,9 @@
       changed_when: false
       register: psa
     - name: Debug | ps aux output
-      ansible.builtin.debug: var=psa verbosity=1
+      ansible.builtin.debug:
+        var: psa
+        verbosity: 1
 
     - name: Get stats of redis cache socket
       ansible.builtin.stat:

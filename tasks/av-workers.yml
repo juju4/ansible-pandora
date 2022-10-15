@@ -10,7 +10,7 @@
   until: dl_result is success
 
 # this breaks apt further calls as broken dependencies
-- name: Install Comodo AV
+- name: Install Comodo AV  # noqa no-free-form
   ansible.builtin.command: "dpkg --ignore-depends=libssl0.9.8 -i {{ install_archives }}/cav-linux_x64.deb"
   args:
     creates: /var/lib/dpkg/info/cav-linux.list

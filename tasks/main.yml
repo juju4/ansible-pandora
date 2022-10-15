@@ -9,7 +9,10 @@
     is_container: true
   when: >
     (ansible_virtualization_type is defined and
-      (ansible_virtualization_type == "docker" or ansible_virtualization_type == "containerd")
+      (ansible_virtualization_type == "docker"
+       or ansible_virtualization_type == "containerd"
+       or ansible_virtualization_type == "container"
+      )
     )
 
 - name: Ensure archives folder exists
@@ -79,38 +82,47 @@
   become: yes
   become_user: root
 
-- import_tasks: poetry.yml
+- name: Import poetry
+  ansible.builtin.import_tasks: poetry.yml
   vars:
     poetry_user: "{{ pandora_user }}"
 
-- import_tasks: redis-source.yml
-- import_tasks: kvrocks-source.yml
+- name: Import redis-source
+  ansible.builtin.import_tasks: redis-source.yml
+- name: Import kvrocks-source
+  ansible.builtin.import_tasks: kvrocks-source.yml
 
-- import_tasks: pandora.yml
+- name: Import pandora
+  ansible.builtin.import_tasks: pandora.yml
   become: yes
   become_flags: -H
   become_user: "{{ pandora_user }}"
 
-- import_tasks: workers.yml
+- name: Import workers
+  ansible.builtin.import_tasks: workers.yml
   become: yes
   become_user: "{{ pandora_user }}"
 
-- import_tasks: av-workers.yml
+- name: Import av-workers
+  ansible.builtin.import_tasks: av-workers.yml
   become: yes
   become_user: root
 
-- import_tasks: apparmor.yml
+- name: Import apparmor
+  ansible.builtin.import_tasks: apparmor.yml
   become: yes
   become_user: root
 
-- import_tasks: firewall-ufw.yml
+- name: Import firewall-ufw
+  ansible.builtin.import_tasks: firewall-ufw.yml
   become: yes
   become_user: root
   when:
     - pandora_ufw|bool
     - not is_container
 
-- import_tasks: systemd.yml
+- name: Import systemd
+  ansible.builtin.import_tasks: systemd.yml
   become: yes
   become_user: root
   when:

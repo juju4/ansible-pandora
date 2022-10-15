@@ -155,11 +155,14 @@
     backup: "{{ pandora_backup }}"
   when: pandora_imap_fetcher_enable | bool
 
-- import_tasks: recent_tasks.yml
+- name: Import recent_tasks
+  ansible.builtin.import_tasks: recent_tasks.yml
   when: pandora_recent_tasks | bool
 
-- import_tasks: disclaimer.yml
+- name: Import disclaimer
+  ansible.builtin.import_tasks: disclaimer.yml
   when: pandora_disclaimer_header | string
 
-- import_tasks: purge.yml
+- name: Import purge
+  ansible.builtin.import_tasks: purge.yml
   when: pandora_purge_enabled | bool
