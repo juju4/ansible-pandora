@@ -4,6 +4,7 @@ name: default-bare
 on:
   push:
   pull_request:
+  workflow_dispatch:
   schedule:  # run weekly, every Thursday 01:00
     - cron: '40 1 * * 4'
 
