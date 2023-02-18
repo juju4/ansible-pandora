@@ -24,6 +24,5 @@
     - preview.yml
     - yara_signature_base.yml
     - comodo.yml
-    - irma.yml
     - mwdb.yml
     - virustotal.yml
