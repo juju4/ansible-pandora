@@ -1,8 +1,9 @@
 ---
 
-- src: https://github.com/juju4/ansible-kvrocks/
-  version: master
-  name: juju4.kvrocks
-- src: https://github.com/geerlingguy/ansible-role-redis/
-  version: master
-  name: geerlingguy.redis
+roles:
+  - src: https://github.com/juju4/ansible-kvrocks/
+    version: main
+    name: juju4.kvrocks
+  - src: https://github.com/geerlingguy/ansible-role-redis/
+    version: master
+    name: geerlingguy.redis
