@@ -531,4 +531,5 @@
     - { role: juju4.harden_nginx, become: yes, become_user: root }
 
 - name: pandora validation
-  import_playbook: ../git-roles/juju4.pandora/molecule/default/verify.yml
+  # import_playbook: ../git-roles/juju4.pandora/molecule/default/verify.yml
+  import_playbook: ../molecule/default/verify.yml

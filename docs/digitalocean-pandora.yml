@@ -158,4 +158,5 @@
     - juju4.pandora
 
 - name: pandora validation
-  import_playbook: ../git-roles/juju4.pandora/molecule/default/verify.yml
+  # import_playbook: ../git-roles/juju4.pandora/molecule/default/verify.yml
+  import_playbook: ../molecule/default/verify.yml
