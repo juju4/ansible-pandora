@@ -7,3 +7,6 @@ roles:
   - src: https://github.com/geerlingguy/ansible-role-redis/
     version: master
     name: geerlingguy.redis
+  - src: https://github.com/juju4/ansible-adduser/
+    version: main
+    name: juju4.adduser
