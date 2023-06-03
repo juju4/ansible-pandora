@@ -76,8 +76,9 @@
           (ansible_virtualization_type == "docker" or ansible_virtualization_type == "containerd")
         )
 
-- name: Updating ClamAV Signatures  # noqa command-instead-of-module
-  ansible.builtin.shell: systemctl stop clamav-freshclam.service; freshclam --quiet; systemctl start clamav-freshclam.service
+- name: Updating ClamAV Signatures  # noqa command-instead-of-module no-changed-when
+  ansible.builtin.shell:
+    cmd: systemctl stop clamav-freshclam.service; freshclam --quiet; systemctl start clamav-freshclam.service
   async: 600
   poll: 15
   become: yes
@@ -88,6 +89,7 @@
         )
 
 - name: Refresh apparmor libreoffice
-  ansible.builtin.command: aa-enforce /etc/apparmor.d/usr.lib.libreoffice*
+  ansible.builtin.command:  # noqa no-changed-when
+    cmd: aa-enforce /etc/apparmor.d/usr.lib.libreoffice*
   become: yes
   become_user: root

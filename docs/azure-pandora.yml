@@ -175,12 +175,10 @@
     ala_target_name: "ALA_NAME"
     ala_target_rg: "ALA_RG"
 
-  collections:
-    - azure.azcollection
-    - community.azure
   handlers:
     - name: Wait a bit if vm state changed to ensure system is up
-      ansible.builtin.pause: seconds=5
+      ansible.builtin.pause:
+        seconds: 5
   tasks:
     # General
     - name: Create resource group
@@ -300,7 +298,9 @@
         name: "{{ base_name }}vm"
       register: vmfacts
     - name: Debug | VM facts
-      ansible.builtin.debug: var=vmfacts verbosity=1
+      ansible.builtin.debug:
+        var: vmfacts
+        verbosity: 1
     # - ansible.builtin.pause:
 
     - name: Set fact | VM public ip
@@ -326,14 +326,15 @@
       ansible.builtin.meta: flush_handlers
 
     - name: Debug | vmout
-      ansible.builtin.debug: var=vmout
+      ansible.builtin.debug:
+        var: vmout
     - name: Get all diagnostic settings for VM
-      azure_rm_monitordiagnosticsetting_info:
+      azure.azcollection.azure_rm_monitordiagnosticsetting_info:
         resource: "{{ vmout.ansible_facts.azure_vm.id }}"
 
     # https://docs.microsoft.com/en-us/azure/virtual-machines/extensions/guest-configuration
     - name: Create VM Extension ConfigurationforLinux
-      azure_rm_virtualmachineextension:
+      azure.azcollection.azure_rm_virtualmachineextension:
         name: ConfigurationforLinux
         publisher: Microsoft.GuestConfiguration
         type_handler_version: 1.0
@@ -352,7 +353,7 @@
     # sudo update-alternatives --install /usr/bin/python python /usr/bin/python2 1
     # Note: documentation review seems to imply logs only to EventHub or BlobStorage (Azure Monitor only for Metrics)
     - name: Create VM Extension LinuxDiagnostic
-      azure_rm_virtualmachineextension:
+      azure.azcollection.azure_rm_virtualmachineextension:
         name: LinuxDiagnostic
         publisher: Microsoft.Azure.Diagnostics
         type_handler_version: 3.0
@@ -366,7 +367,7 @@
 
     # "You will need to have version 3.0 or higher of the Linux Diagnostic extension installed in order to edit your diagnostic settings through the portal."
     - name: Create diagnostic setting for VM
-      azure_rm_monitordiagnosticsetting:
+      azure.azcollection.azure_rm_monitordiagnosticsetting:
         name: "Diagnostics2labsentinel"
         resource:
           name: "{{ base_name }}vm"
@@ -401,7 +402,8 @@
       register: backuppolicy
 
     - name: Debug | backuppolicy
-      ansible.builtin.debug: var=backuppolicy
+      ansible.builtin.debug:
+        var: backuppolicy
 
     - name: Get Recovery Point Details
       azure.azcollection.azure_rm_backupazurevm_info:
@@ -472,8 +474,6 @@
     harden_fw: false
     # else no make/gcc for user _pandora, eventually after initial install
     harden_restrict_compiler: false
-  collections:
-    - community.general
   pre_tasks:
     - name: Check host is reachable
       ansible.builtin.ping:
@@ -530,6 +530,6 @@
     - juju4.pandora
     - { role: juju4.harden_nginx, become: yes, become_user: root }
 
-- name: pandora validation
+- name: Pandora validation
   # import_playbook: ../git-roles/juju4.pandora/molecule/default/verify.yml
   import_playbook: ../molecule/default/verify.yml

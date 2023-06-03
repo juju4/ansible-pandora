@@ -2,14 +2,13 @@
 
 - name: Digital Ocean | create droplet
   hosts: localhost
-  collections:
-    - community.digitalocean.digital_ocean_droplet
   vars:
     ansible_python_interpreter: /usr/bin/python3
     droplet_name: dopandora
   handlers:
-    - name: wait 5 sec if vm state changed to ensure system is up
-      ansible.builtin.pause: seconds=5
+    - name: Wait 5 sec if vm state changed to ensure system is up
+      ansible.builtin.pause:
+        seconds: 5
   tasks:
     - name: Gather ID about DigitalOcean SSH keys
       community.digitalocean.digital_ocean_sshkey_info:
@@ -45,7 +44,7 @@
       register: my_droplet
       when: "exist.msg is defined and 'Unable to find droplet with name' in exist.msg"
       notify:
-        - wait 5 sec if vm state changed to ensure system is up
+        - Wait 5 sec if vm state changed to ensure system is up
 
     - name: Gather information about droplet with network
       community.digitalocean.digital_ocean_droplet_info:
@@ -112,7 +111,7 @@
       # why?
       - '::'
   pre_tasks:
-    - name: validate ansible_remote_tmp dir permissions
+    - name: Validate ansible_remote_tmp dir permissions
       ansible.builtin.file:
         path: "{{ ansible_remote_tmp }}"
         state: directory
@@ -135,8 +134,9 @@
       register: pkg_result
       until: pkg_result
     - name: Pause 10 sec to avoid apt lock
-      ansible.builtin.pause: seconds=10
-      # update DNS= in /etc/systemd/resolved.conf?
+      ansible.builtin.pause:
+        seconds: 10
+        # update DNS= in /etc/systemd/resolved.conf?
   roles:
     - juju4.adduser
     - juju4.tinyproxy
@@ -157,6 +157,6 @@
   roles:
     - juju4.pandora
 
-- name: pandora validation
+- name: Pandora validation
   # import_playbook: ../git-roles/juju4.pandora/molecule/default/verify.yml
   import_playbook: ../molecule/default/verify.yml

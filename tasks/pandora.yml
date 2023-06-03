@@ -23,7 +23,8 @@
   register: poetry_git_sys
 
 - name: Poetry | use system git
-  ansible.builtin.command: "poetry config experimental.system-git-client {{ pandora_poetry_system_git | bool | lower }} --local"
+  ansible.builtin.command:  # noqa no-changed-when
+    cmd: "poetry config experimental.system-git-client {{ pandora_poetry_system_git | bool | lower }} --local"
   args:
     chdir: "{{ pandora_root }}"
   environment:
