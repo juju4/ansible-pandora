@@ -497,11 +497,11 @@
     - juju4.adduser
     - juju4.tinyproxy
     - juju4.harden
-    - kbrebanov.osquery
+    - juju4.osquery
     # - juju4.falco
-    - { role: cloudalchemy.node_exporter, when: monitoring_enable|bool }
-    - { role: cloudalchemy.prometheus, when: monitoring_enable|bool }
-    - { role: cloudalchemy.grafana, when: monitoring_enable|bool }
+    # - { role: cloudalchemy.node_exporter, when: monitoring_enable|bool }
+    # - { role: cloudalchemy.prometheus, when: monitoring_enable|bool }
+    # - { role: cloudalchemy.grafana, when: monitoring_enable|bool }
 
 - name: Configure pandora VM host - unprivileged
   hosts: pandoragroup

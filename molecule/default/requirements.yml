@@ -10,3 +10,15 @@ roles:
   - src: https://github.com/juju4/ansible-adduser/
     version: main
     name: juju4.adduser
+  - src: https://github.com/juju4/ansible-harden/
+    version: main
+    name: juju4.harden
+  - src: https://github.com/juju4/ansible-tinyproxy/
+    version: main
+    name: juju4.tinyproxy
+  - src: https://github.com/juju4/ansible-osquery/
+    version: main
+    name: juju4.osquery
+  - src: https://github.com/juju4/ansible-harden-nginx/
+    version: main
+    name: juju4.harden_nginx
