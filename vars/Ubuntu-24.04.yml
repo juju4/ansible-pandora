@@ -49,3 +49,4 @@ pandora_pkgs:
   - cron
 
 ufw_rulename_ssh: OpenSSH
+pandora_python_v: 3.12
