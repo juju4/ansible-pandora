@@ -6,7 +6,7 @@
   vars:
     pandora_home: /var/_pandora
     pandora_start: "{{ pandora_home }}/pandora/bin/start.py"
-    binary_redis: "{{ pandora_home }}/redis/src/redis-server"
+    binary_redis: "{{ pandora_home }}/valkey/src/valkey-server"
     binary_kvrocks: "{{ pandora_home }}/kvrocks/src/kvrocks"
     config: "{{ pandora_home }}/pandora/config/generic.json"
     ports:
