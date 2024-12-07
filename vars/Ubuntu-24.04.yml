@@ -46,5 +46,6 @@ pandora_pkgs:
   - libcairo2-dev
   # AV workers
   - clamav-daemon
+  - cron
 
 ufw_rulename_ssh: OpenSSH

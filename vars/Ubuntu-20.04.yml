@@ -43,5 +43,6 @@ pandora_pkgs:
   - swig
   # AV workers
   - clamav-daemon
+  - cron
 
 ufw_rulename_ssh: OpenSSH
