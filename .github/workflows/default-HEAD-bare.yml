@@ -106,10 +106,10 @@ jobs:
           set -x
           sudo ls -la /var/_pandora/
           sudo ls -la /var/_pandora/kvrocks
-          sudo ls -la /var/_pandora/redis
+          sudo ls -la /var/_pandora/valkey || true
           sudo ls -la /var/_pandora/pandora
           sudo cat /var/_pandora/pandora/config/generic.json
-          sudo ls -la /var/_pandora/kvrocks/src/kvrocks /var/_pandora/redis/src/redis-server || true
+          sudo ls -la /var/_pandora/kvrocks/src/kvrocks /var/_pandora/valkey/src/valkey-server || true
         if: ${{ always() }}
         continue-on-error: true
       - name: After script - logs
