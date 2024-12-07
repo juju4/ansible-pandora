@@ -123,8 +123,8 @@ jobs:
       - name: After script - misc
         run: |
           set -x
-          find /var/_pandora/.cache/pypoetry/ /usr -iname 'uno.py' -ls
-          find /var/_pandora/.cache/pypoetry/ /usr -iname 'unohelper.py' -ls
+          sudo find /var/_pandora/.cache/pypoetry/ /usr -iname 'uno.py' -ls || true
+          sudo find /var/_pandora/.cache/pypoetry/ /usr -iname 'unohelper.py' -ls || true
           sudo ls -la /var/lib/clamav/ || true
           sudo ls -la /var/run/clamav/clamd.ctl || true
           ls -la /etc/apparmor.d/usr.lib.libreoffice* || true
