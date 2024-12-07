@@ -105,6 +105,10 @@ https://github.com/python-poetry/poetry/issues/6428
 https://github.com/jelmer/dulwich/issues/1032
 Normally fixed in upstream dulwich 0.20.46 but still seeing occurrence. As workaround, either revert to poetry 1.1.15, either force use of system git.
 
+* Memory can easily be an issue and result in oom-kill some process. Recommend at least 6GB of RAM.
+
+* If web UI does not react as expected, check browser console for possible Content-Security-Policy mismatch.
+
 ## License
 
 BSD 2-clause
