@@ -113,6 +113,17 @@
       when:
         - not is_container|bool
 
+    - name: Check poetry packages
+      ansible.builtin.command:
+        cmd: /usr/local/share/poetry/bin/poetry install --dry-run --sync --no-ansi
+      changed_when: false
+      register: poetrylist
+    - name: Ensure some dependencies are present in poetry
+      ansible.builtin.assert:
+        that:
+          - "'unoserver' in poetrylist.stdout"
+          - "'oletools' in poetrylist.stdout"
+
     - name: Ensure ports are listening
       ansible.builtin.wait_for:
         host: "{{ item.h }}"
