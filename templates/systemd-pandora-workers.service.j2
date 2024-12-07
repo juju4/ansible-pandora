@@ -20,6 +20,9 @@ SyslogIdentifier=pandora
 User={{ pandora_user }}
 Group={{ pandora_user }}
 Environment=PATH={{ venv_pandora.stdout }}:/usr/sbin:/usr/bin:/sbin:/bin:{{ poetry_root }}/bin
+{% if pandora_proxy_ip is defined and pandora_proxy_ip | string and pandora_proxy_port is defined and pandora_proxy_port | string %}
+EnvironmentFile=/etc/environment
+{% endif %}
 
 # Reduce Attack Surface
 NoNewPrivileges=yes
@@ -62,6 +65,7 @@ MemoryDenyWriteExecute=yes
 RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
 
 IPAccounting=yes
+# If using below and a proxy exists, ensure to include it.
 # IPAddressAllow=localhost link-local multicast 10.0.0.0/8 192.168.0.0/16
 
 CapabilityBoundingSet=~CAP_AUDIT_CONTROL CAP_AUDIT_READ CAP_DAC_READ_SEARCH
@@ -102,9 +106,9 @@ SystemCallErrorNumber=EPERM
 SystemCallArchitectures=native
 
 {% if pandora_cgroups_restriction_enable|bool %}
-CPUShares={{ pandora_cgroups_cpushares | default('1024') }}
+CPUWeight={{ pandora_cgroups_cpushares | default('1024') }}
 CPUQuota={{ pandora_cgroups_cpuquota | default('80%') }}
-MemoryLimit={{ pandora_cgroups_memorylimit | default('4G') }}
+MemoryMax={{ pandora_cgroups_memorylimit | default('4G') }}
 {% endif %}
 
 [Install]

@@ -1,0 +1,68 @@
+{{ ansible_managed | comment }}
+
+# /etc/nginx/site-enabled/pandora
+
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+
+    include /etc/nginx/harden-nginx-https;
+{% if hardenwebserver_cert is defined and hardenwebserver_cert == 'selfsigned' %}
+    ssl_certificate {{ hardenwebserver_ssl_cert | default( ssl_dir + "/" + ansible_fqdn + ".crt") }};
+{% else %}
+    ssl_certificate {{ hardenwebserver_ssl_cert | default(ssl_fullchain) }};
+{% endif %}
+    ssl_certificate_key {{ hardenwebserver_ssl_key | default( ssl_privatedir + "/" + ansible_fqdn + ".key") }};
+
+    server_name {{ ansible_fqdn }};
+
+    access_log /var/log/nginx/pandora.access.log;
+    error_log /var/log/nginx/pandora.error.log;
+
+    server_tokens off;
+    etag off;
+
+{% if harden_nginx_cspreport_template is defined and harden_nginx_cspreport_template %}
+    location ~ /csp/report.php {
+        allow all;
+        include snippets/fastcgi-php.conf;
+        fastcgi_param SCRIPT_FILENAME $request_filename;
+        fastcgi_pass unix:/var/run/php/php{{ harden_nginx_phpdir | regex_replace('^/etc/php/', '') }}-fpm.sock;
+    }
+
+    location ~ /csp/test-csp.html {
+        add_header Content-Security-Policy "default-src 'none'; script-src 'self'; connect-src 'self'; img-src 'self'; style-src 'self'; upgrade-insecure-requests; require-trusted-types-for 'script'; report-uri /csp/report.php;";
+    }
+
+    location ~ /csp/log {
+        deny all;
+    }
+
+{% endif %}
+
+    location / {
+        add_header X-Content-Type-Options nosniff;
+        add_header X-Frame-Options SAMEORIGIN;
+        #add_header X-Frame-Options DENY;
+        add_header Strict-Transport-Security "max-age=63072000; includeSubdomains; preload";
+        # CSP?
+        add_header Content-Security-Policy "{{ hardenwebserver_header_csp }}";
+        #add_header Referrer-Policy strict-origin-when-cross-origin;
+        add_header Referrer-Policy origin;
+
+        # Adapt this to your configuration (port, subdirectory (see below))
+        proxy_pass  http://{{ pandora_listen_ip }}:{{ pandora_listen_port }};
+        proxy_pass_request_headers on;
+
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+        # If you want to log the remote port of the file senders, you'll need that
+        proxy_set_header X-Remote-Port $remote_port;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        proxy_redirect     off;
+    }
+}

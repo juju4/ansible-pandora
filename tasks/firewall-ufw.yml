@@ -45,6 +45,18 @@
     to_port: "{{ item }}"
   with_items: "{{ pandora_ufw_allow_ports_in }}"
 
+- name: UFW | allow outgoing proxy traffic if apply
+  community.general.ufw:
+    rule: allow
+    interface: "{{ pandora_ufw_if }}"
+    direction: out
+    dest: "{{ pandora_proxy_ip }}"
+    to_port: "{{ pandora_proxy_port }}"
+    log: "{{ pandora_ufw_out_logging }}"
+  when:
+    - pandora_proxy_ip | string
+    - pandora_proxy_port | string
+
 - name: UFW | allow outgoing traffic for defined ports - {{ pandora_ufw_if }}
   community.general.ufw:
     rule: allow

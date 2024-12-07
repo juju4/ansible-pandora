@@ -49,6 +49,17 @@
   changed_when: false
   failed_when: venv_pandora.rc != 0
 
+# https://github.com/unoconv/unoconv/issues/372#issuecomment-1079801009
+- name: Ensure uno library is available in poetry environment
+  ansible.builtin.file:
+    src: "/usr/lib/python3/dist-packages/{{ item }}"
+    dest: "{{ venv_pandora.stdout }}/../lib/python3.12/site-packages/{{ item }}"
+    state: link
+    mode: '0644'
+  loop:
+    - uno.py
+    - unohelper.py
+
 - name: Ensure .env is configured
   ansible.builtin.template:
     src: env.j2
@@ -56,6 +67,13 @@
     mode: '0644'
     owner: "{{ pandora_user }}"
     backup: "{{ pandora_backup }}"
+  notify:
+    - Restart pandora-imap_fetcher
+    - Restart pandora-kvrocks
+    - Restart pandora-redis
+    - Restart pandora-unoserver
+    - Restart pandora-web
+    - Restart pandora-workers
 
 - name: Ensure config.json is configured
   ansible.builtin.template:
@@ -64,6 +82,38 @@
     mode: '0644'
     owner: "{{ pandora_user }}"
     backup: "{{ pandora_backup }}"
+    # FIXME! os.chmod(b_path, mode)\nPermissionError: [Errno 1] Operation not permitted:
+    # validate: "python3 -mjson.tool %s"
+  notify:
+    - Restart pandora-imap_fetcher
+    - Restart pandora-kvrocks
+    - Restart pandora-redis
+    - Restart pandora-unoserver
+    - Restart pandora-web
+    - Restart pandora-workers
+
+- name: Ensure logging.json is configured
+  ansible.builtin.template:
+    src: logging.json.j2
+    dest: "{{ pandora_root }}/config/logging.json"
+    mode: '0644'
+    owner: "{{ pandora_user }}"
+    backup: "{{ pandora_backup }}"
+  notify:
+    - Restart pandora-imap_fetcher
+    - Restart pandora-kvrocks
+    - Restart pandora-redis
+    - Restart pandora-unoserver
+    - Restart pandora-web
+    - Restart pandora-workers
+
+- name: Validate config files are valid json
+  ansible.builtin.shell:
+    cmd: "python3 -mjson.tool {{ item }} > /dev/null"
+  loop:
+    - "{{ pandora_root }}/config/generic.json"
+    - "{{ pandora_root }}/config/logging.json"
+  changed_when: false
 
 - name: Ensure working git pull
   ansible.builtin.replace:
@@ -110,7 +160,7 @@
     url: "https://github.com/dropzone/dropzone/releases/download/{{ pandora_dropzone_version }}/dist.zip"
     dest: "{{ pandora_home }}/dropzone-dist.zip"
     mode: '0600'
-    checksum: "sha256:4b0100a34ee5751ca147ab6f7964a822b212554807676cf44dba6b6e29ab9ba5"
+    checksum: "{{ pandora_dropzone_checksum }}"
   register: dl_result
   until: dl_result is success
 

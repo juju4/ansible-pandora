@@ -98,6 +98,14 @@
   become_flags: -H
   become_user: "{{ pandora_user }}"
 
+- name: Ensure logrotate is configured
+  ansible.builtin.template:
+    src: logrotate-pandora.j2
+    dest: /etc/logrotate.d/pandora
+    mode: '0644'
+    owner: root
+    backup: "{{ pandora_backup }}"
+
 - name: Import workers
   ansible.builtin.import_tasks: workers.yml
   become: yes
@@ -127,3 +135,9 @@
   become_user: root
   when:
     - not is_container
+
+- name: Check if pandora port is listening
+  ansible.builtin.wait_for:
+    port: "{{ pandora_listen_port }}"
+  when:
+    - not is_container | bool

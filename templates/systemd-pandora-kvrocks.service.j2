@@ -9,7 +9,7 @@ Requires=network.target
 
 [Service]
 Type=simple
-ExecStart={{ pandora_home }}/kvrocks/src/kvrocks -c {{ pandora_root }}/storage/kvrocks.conf
+ExecStart={{ pandora_home }}/kvrocks/build/kvrocks -c {{ pandora_root }}/storage/kvrocks.conf
 WorkingDirectory={{ pandora_root }}/bin
 Restart=on-failure
 RestartSec=15
@@ -101,9 +101,9 @@ SystemCallErrorNumber=EPERM
 SystemCallArchitectures=native
 
 {% if pandora_cgroups_restriction_enable|bool %}
-CPUShares={{ pandora_cgroups_cpushares | default('1024') }}
+CPUWeight={{ pandora_cgroups_cpushares | default('1024') }}
 CPUQuota={{ pandora_cgroups_cpuquota | default('80%') }}
-MemoryLimit={{ pandora_cgroups_memorylimit | default('4G') }}
+MemoryMax={{ pandora_cgroups_memorylimit | default('4G') }}
 {% endif %}
 
 [Install]

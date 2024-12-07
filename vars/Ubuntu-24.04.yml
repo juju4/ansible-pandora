@@ -31,7 +31,6 @@ pandora_pkgs:
   - antiword
   - unrtf
   - poppler-utils
-  - pstotext
   - tesseract-ocr
   - flac
   - ffmpeg
@@ -41,6 +40,10 @@ pandora_pkgs:
   - sox
   - libjpeg-dev
   - swig
+  # seems required for yara-python
+  - libssl-dev
+  # Required by reportlab
+  - libcairo2-dev
   # AV workers
   - clamav-daemon
 

@@ -525,7 +525,9 @@
       - { p: "/var/log/nginx", perm: rwx, m: '0755' }
     hardenwebserver_systemd_files_acl:
       - { p: "/etc/ssl/private/{{ ansible_fqdn }}.key", perm: r }
-      - { p: "/etc/ssl/{{ ansible_fqdn }}.crt", perm: r }
+      - { p: "/etc/ssl/certs/{{ ansible_fqdn }}.crt", perm: r }
+    # FIXME! try nonce instead of unsafe-inline
+    hardenwebserver_header_csp: "default-src 'none'; script-src 'self' 'report-sample' 'unsafe-inline'; connect-src 'self'; img-src 'self' data: ; style-src 'self'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests; require-trusted-types-for 'script'; report-uri /csp/report.php;"
   roles:
     - juju4.pandora
     - { role: juju4.harden_nginx, become: yes, become_user: root }

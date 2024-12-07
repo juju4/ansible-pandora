@@ -1,14 +1,17 @@
 ---
 
-pandora_version: c3770856ed4849e6491b796f700598d2972d3ffa
-pandora_poetry_install_version: e8d8f76750e1abaebd628e2323a49163d102c9d6
-pandora_poetry_hash: 'sha256:08a38ab8de719d4012af4d62c37ce09e84edce6e1c4da7c5ccbcade359312c8b'
+# 1.9.0
+pandora_version: 0610edbe97d1f64a4a3d06690730840421fa4463
+pandora_poetry_install_version: fcd759d6feb9142736a19f8a753be975a120be87
+pandora_poetry_hash: 'sha256:66db5477a597b6176202ef77792076057ce50d2c5a2d2d2978c63e1f144d7b95'
 pandora_user: _pandora
 pandora_home: /var/_pandora
 pandora_root: "{{ pandora_home }}/pandora"
 poetry_root: /usr/local/share/poetry
-pandora_poetry_version: 1.2.1
+pandora_poetry_version: 1.8.4
 pandora_poetry_system_git: true
+pandora_kvrocks_version: dc4d53031abe9377dd91adf705ae2b2ca1b0b9e9  # 2.10.1
+pandora_valkey_version: 4fbab5740bfef66918d6c2950dd2b3b4e07815a2  # 8.0.1
 
 pandora_listen_ip: 0.0.0.0
 pandora_listen_port: 6100
@@ -18,6 +21,9 @@ pandora_email_smtp_host: localhost
 pandora_email_smtp_port: 25
 pandora_email_to: ["Investigation Team <investigation_unit@myorg.local>"]
 pandora_email_from: "Pandora <pandora@myorg.local>"
+pandora_email_smtp_auth: false
+pandora_email_smtp_auth_user: johndoe@myorg.local
+pandora_email_smtp_auth_pass:
 # imap fetcher
 pandora_imap_fetcher_enable: false
 pandora_imap_server: mail.myimap.server
@@ -53,38 +59,43 @@ pandora_systemd_units:
 # pandora_mwdb_apikey: 'null'
 # pandora_virustotal_apikey: 'null'
 
+# https://github.com/pandora-analysis/pandora/blob/v1.9.0/tools/3rdparty.py
 # this must match https://github.com/pandora-analysis/pandora/blob/main/website/web/sri.txt
 # dropzone directly in pandora.yml
-pandora_dropzone_version: v6.0.0-beta.1
-pandora_moment_version: 2.29.3
-pandora_moment_checksum: 'sha256:8240b88c4879b771bdc2ab571fe26d8c10dc92f0e1c130ae468a01ef8d57fe52'
+pandora_dropzone_version: v6.0.0-beta.2
+pandora_dropzone_checksum: "sha256:4c79e42e74d19d066c2d5476eb0bf31c0de0d008c533fe3ea4a615c6b1404486"
+pandora_moment_version: 2.29.4
+pandora_moment_checksum: 'sha256:e833c446bf3e3e89051d4823c0e0035d8c87f9c336bf1bde4622d8a0633b9199'
 pandora_web_static:
-  - { u: 'https://code.jquery.com/jquery-3.6.0.min.js',
+  - { u: 'https://code.jquery.com/jquery-3.7.1.min.js',
       d: 'js/lib/jquery.min.js',
-      c: 'sha256:ff1523fb7389539c84c65aba19260648793bb4f5e29329d2ee8804bc37a3fe6e'
+      c: 'sha256:fc9a93dd241f6b045cbff0481cf4e1901becd0e12fb45166a8f17f95823f0b1a'
+  }
+  # FIXME! idempotency issue for next two?
+  - { u: 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js',
+      d: 'js/lib/chart.min.js',
+      c: 'sha256:e9b0f875106021fb3d58120ad8ebdd3e7d32135a4452fd8918c72ac6475f2bd3'
   }
   - { u: 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.8.0/chart.min.js',
       d: 'js/lib/chart.min.js',
       c: 'sha256:70754ee1da997da9918560fbb38897c9a5d654ad74a1d0feaa9e3189d173a932'
   }
-  - { u: 'https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js',
+  - { u: 'https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.10.0/js/bootstrap-datepicker.min.js',
       d: 'js/lib/bootstrap-datepicker.min.js',
-      c: 'sha256:6ea55ea86749ee1fe560fabac6b3effd81b33046fa74dc657e24d41d28110a9f'
+      c: 'sha256:899a7d77238c24a3c5767d5432b6bd64c84f640952199533761aaa1208a313e4'
   }
-  # 404
-  # - { u: 'https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.css',
-  #     d: 'css/lib/bootstrap-datepicker.min.css',
-  #     c: 'sha256:xxx'
-  # }
-  - { u: 'https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css',
+  - { u: 'https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.10.0/css/bootstrap-datepicker.min.css',
+      d: 'css/lib/bootstrap-datepicker.min.css',
+      c: 'sha256:bf2eeb9dceb6a5636af3716f4492ac3433bafbd1151864293e4884dd17421b21'
+  }
+  - { u: 'https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css',
       d: 'css/lib/datatables.css',
-      c: 'sha256:38d62f20743669a8f5d53178bf5b380505bf85f9757367705d7b534bf24768ce'
+      c: 'sha256:5e9bf0ca99854ef5cde954de1b15f0410c38d658d8a8f9048003911aa6b36b26'
   }
-  # 404
-  # - { u: 'https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.js',
-  #     d: 'js/lib/datatables.js',
-  #     c: 'sha256:xxx'
-  # }
+  - { u: 'https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js',
+      d: 'js/lib/datatables.js',
+      c: 'sha256:24362c145a81e1e2fd95185c4300d2595afb2cadd9f1580c2ddce95bc19b2084'
+  }
 
 install_archives: /var/_install
 # needed ansible Unprivileged become user
@@ -136,6 +147,9 @@ pandora_ufw_allow_ports_out:
   # - '11371'
   ## using dhcp?
   # - '67'
+# web proxy? must also be configured in /etc/environment
+pandora_proxy_ip:
+pandora_proxy_port:
 
 pandora_ufw_allow_if_out: []
 

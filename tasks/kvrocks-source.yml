@@ -12,22 +12,28 @@
       - libtool
       - googletest
       - libgtest-dev
+      - git
+      - cmake
+      - python3
+      - libssl-dev
     state: present
   become: yes
   become_user: root
 
 - name: Clone kvrocks repository
   ansible.builtin.git:
-    repo: https://github.com/apache/incubator-kvrocks.git
+    repo: https://github.com/apache/kvrocks.git
     dest: "{{ pandora_home }}/kvrocks"
-    version: 2.0
+    version: "{{ pandora_kvrocks_version }}"
+    update: yes
   become: yes
   become_user: "{{ pandora_user }}"
 
 - name: Build kvrocks
-  ansible.builtin.command: make -j4
+  ansible.builtin.command:
+    cmd: ./x.py build -DENABLE_OPENSSL=ON
   args:
     chdir: "{{ pandora_home }}/kvrocks"
-    creates: "{{ pandora_home }}/kvrocks/src/kvrocks"
+    creates: "{{ pandora_home }}/kvrocks/build/kvrocks"
   become: yes
   become_user: "{{ pandora_user }}"
