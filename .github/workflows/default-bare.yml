@@ -143,3 +143,11 @@ jobs:
           curl -vL http://localhost:6100
         if: ${{ always() }}
         continue-on-error: true
+      - name: After script - apparmor
+        run: |
+          set -x
+          sudo grep -r "runbindable*/*" /etc/apparmor.d
+          sudo ls -l /etc/apparmor.d/usr.lib.libreoffice*
+          sudo cat /etc/apparmor.d/usr.lib.libreoffice*
+        if: ${{ always() }}
+        continue-on-error: true
