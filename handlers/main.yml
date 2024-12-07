@@ -93,3 +93,5 @@
     cmd: aa-enforce /etc/apparmor.d/usr.lib.libreoffice*
   become: yes
   become_user: root
+  when:
+    - not is_container
