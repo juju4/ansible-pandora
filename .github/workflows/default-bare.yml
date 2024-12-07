@@ -89,7 +89,12 @@ jobs:
         continue-on-error: true
       - name: After script - systemd
         run: |
-          systemctl -l --no-pager status pandora || true
+          systemctl -l --no-pager status pandora-imap_fetcher || true
+          systemctl -l --no-pager status pandora-kvrocks|| true
+          systemctl -l --no-pager status pandora-redis || true
+          systemctl -l --no-pager status pandora-unoserver || true
+          systemctl -l --no-pager status pandora-web || true
+          systemctl -l --no-pager status pandora-workers || true
           systemctl -l --no-pager status clamav-freshclam || true
           systemctl -l --no-pager status clamav-daemon || true
           systemd-analyze --no-pager security || true
@@ -109,16 +114,28 @@ jobs:
         continue-on-error: true
       - name: After script - logs
         run: |
+          set -x
           sudo tail -200 /var/log/syslog
+          sudo grep oom /var/log/syslog
+          journalctl -xe -l --no-pager | grep -iE "pandora.*error"
         if: ${{ always() }}
         continue-on-error: true
       - name: After script - misc
         run: |
           set -x
+          find /var/_pandora/.cache/pypoetry/ /usr -iname 'uno.py' -ls
+          find /var/_pandora/.cache/pypoetry/ /usr -iname 'unohelper.py' -ls
           sudo ls -la /var/lib/clamav/ || true
           sudo ls -la /var/run/clamav/clamd.ctl || true
           ls -la /etc/apparmor.d/usr.lib.libreoffice* || true
           sudo cat /etc/apparmor.d/usr.lib.libreoffice.program.soffice.bin || true
+          sudo ls -l /tmp/apparmor-bugreport-*.txt || true
+          sudo cat /tmp/apparmor-bugreport-*.txt || true
+        if: ${{ always() }}
+        continue-on-error: true
+      - name: After script - poetry
+        run: |
+          /usr/local/share/poetry/bin/poetry install --dry-run --sync --no-ansi
         if: ${{ always() }}
         continue-on-error: true
       - name: After script - curl
