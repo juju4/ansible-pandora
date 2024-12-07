@@ -162,5 +162,6 @@ jobs:
           sudo grep -r "runbindable*/*" /etc/apparmor.d
           sudo ls -l /etc/apparmor.d/usr.lib.libreoffice*
           sudo cat /etc/apparmor.d/usr.lib.libreoffice*
+          dpkg -l | grep apparmor
         if: ${{ always() }}
         continue-on-error: true
