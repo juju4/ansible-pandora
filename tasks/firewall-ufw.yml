@@ -54,6 +54,7 @@
     to_port: "{{ pandora_proxy_port }}"
     log: "{{ pandora_ufw_out_logging }}"
   when:
+    - pandora_proxy_ip != None
     - pandora_proxy_ip | string
     - pandora_proxy_port | string
 
