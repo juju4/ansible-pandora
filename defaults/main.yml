@@ -43,6 +43,8 @@ pandora_disclaimer_header: ''
 pandora_purge_enabled: true
 pandora_purge_mtime: +30
 
+pandora_apparmor_enable: false
+
 pandora_cgroups_restriction_enable: true
 pandora_systemd_units:
   - pandora-imap_fetcher

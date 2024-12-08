@@ -120,6 +120,8 @@
   ansible.builtin.import_tasks: apparmor.yml
   become: yes
   become_user: root
+  when:
+    - pandora_apparmor_enable | bool
 
 - name: Import firewall-ufw
   ansible.builtin.import_tasks: firewall-ufw.yml
