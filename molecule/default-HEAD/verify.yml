@@ -116,6 +116,10 @@
     - name: Check poetry packages
       ansible.builtin.command:
         cmd: /usr/local/share/poetry/bin/poetry install --dry-run --sync --no-ansi
+      args:
+        chdir: "/var/_pandora/pandora"
+      environment:
+        XDG_CONFIG_HOME: "/var/_pandora/.config"
       changed_when: false
       register: poetrylist
     - name: Ensure some dependencies are present in poetry
