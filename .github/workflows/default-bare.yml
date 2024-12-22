@@ -130,6 +130,7 @@ jobs:
           set -x
           sudo tail -200 /var/log/syslog
           sudo grep oom /var/log/syslog
+          sudo tail -200 /var/_pandora/pandora/logs/warning.log
           journalctl -xe -l --no-pager | grep -iE "pandora.*error"
         if: ${{ always() }}
         continue-on-error: true
