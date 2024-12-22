@@ -54,7 +54,7 @@ ProtectControlGroups=true
 LockPersonality=true
 RestrictRealtime=true
 RestrictNamespaces=yes
-RestrictNamespaces=~CLONE_NEWCGROUP CLONE_NEWIPC CLONE_NEWNET CLONE_NEWPID
+# RestrictNamespaces=~CLONE_NEWCGROUP CLONE_NEWIPC CLONE_NEWNET CLONE_NEWPID
 RestrictSUIDSGID=yes
 MemoryDenyWriteExecute=yes
 
@@ -104,6 +104,7 @@ SystemCallArchitectures=native
 CPUWeight={{ pandora_cgroups_cpushares | default('1024') }}
 CPUQuota={{ pandora_cgroups_cpuquota | default('80%') }}
 MemoryMax={{ pandora_cgroups_memorylimit | default('4G') }}
+IOWeight={{ pandora_cgroups_ioweight | default('100') }}
 {% endif %}
 
 [Install]
