@@ -44,7 +44,7 @@
   changed_when: "'No dependencies to install or update' not in poetry_install.stdout"
 
 - name: Get pandora poetry virtualenv bin path
-  ansible.builtin.command: find /var/_pandora/.cache/pypoetry/virtualenvs/ -maxdepth 2 -type d -ipath '*/bin'
+  ansible.builtin.command: "find {{ pandora_home }}/.cache/pypoetry/virtualenvs/ -maxdepth 2 -type d -ipath '*/bin'"
   register: venv_pandora
   changed_when: false
   failed_when: venv_pandora.rc != 0
