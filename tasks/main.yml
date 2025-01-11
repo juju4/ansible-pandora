@@ -3,6 +3,16 @@
 - name: Include version-specific variables for Ubuntu.
   ansible.builtin.include_vars: "{{ ansible_distribution }}-{{ ansible_distribution_version }}.yml"
   when: ansible_distribution == 'Ubuntu'
+- name: Include poetry v1.x variables
+  ansible.builtin.include_vars: poetry1.yml
+  when:
+    - "pandora_poetry_version is version('2.0', '<')"
+- name: Include poetry v2.x variables
+  ansible.builtin.include_vars: poetry2.yml
+  when: >
+    ("pandora_poetry_version is version('2.0', '>=')")
+    or pandora_poetry_version is not defined
+    or pandora_poetry_version | length == 0
 
 - name: Set fact is_container
   ansible.builtin.set_fact:

@@ -13,7 +13,7 @@
     force: no
 
 - name: Poetry | check system git config
-  ansible.builtin.command: "poetry config experimental.system-git-client"
+  ansible.builtin.command: "poetry config {{ poetry_setting1 }}"
   args:
     chdir: "{{ pandora_root }}"
   environment:
@@ -24,7 +24,7 @@
 
 - name: Poetry | use system git
   ansible.builtin.command:  # noqa no-changed-when
-    cmd: "poetry config experimental.system-git-client {{ pandora_poetry_system_git | bool | lower }} --local"
+    cmd: "poetry config {{ poetry_setting1 }} {{ pandora_poetry_system_git | bool | lower }} --local"
   args:
     chdir: "{{ pandora_root }}"
   environment:
