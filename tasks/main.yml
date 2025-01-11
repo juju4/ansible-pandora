@@ -6,6 +6,8 @@
 - name: Include poetry v1.x variables
   ansible.builtin.include_vars: poetry1.yml
   when:
+    - pandora_poetry_version is defined
+    - pandora_poetry_version | length != 0
     - "pandora_poetry_version is version('2.0', '<')"
 - name: Include poetry v2.x variables
   ansible.builtin.include_vars: poetry2.yml
