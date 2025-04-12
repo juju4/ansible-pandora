@@ -154,5 +154,6 @@ pandora_proxy_ip:
 pandora_proxy_port:
 
 pandora_ufw_allow_if_out: []
+pandora_ufw_out_custom_rules: []
 
 is_container: false
