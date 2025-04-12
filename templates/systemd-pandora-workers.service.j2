@@ -6,7 +6,7 @@
 [Unit]
 Description=Pandora Analysis workers service
 Requires=network.target
-After=pandora-redis pandora-kvrocks
+After=pandora-redis.service pandora-kvrocks.service
 
 [Service]
 ExecStart={{ venv_pandora.stdout }}/python3 {{ pandora_root }}/bin/workers_manager.py

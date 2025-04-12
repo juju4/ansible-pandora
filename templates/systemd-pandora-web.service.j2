@@ -6,7 +6,7 @@
 [Unit]
 Description=Pandora Analysis Web service
 Requires=network.target
-After=pandora-redis pandora-kvrocks pandora-workers
+After=pandora-redis.service pandora-kvrocks.service pandora-workers.service
 
 [Service]
 Type=simple

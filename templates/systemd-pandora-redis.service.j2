@@ -47,7 +47,7 @@ ProtectKernelModules=yes
       (ansible_os_family == 'RedHat' and ansible_distribution_major_version|int > 8 )
 %}
 ProtectKernelLogs=yes
-ProtectHostname=yes
+# ProtectHostname=yes
 ProtectClock=yes
 {% endif %}
 
