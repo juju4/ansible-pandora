@@ -106,7 +106,7 @@ SystemCallArchitectures=native
 {% if pandora_cgroups_restriction_enable|bool %}
 CPUWeight={{ pandora_cgroups_cpushares | default('1024') }}
 CPUQuota={{ pandora_cgroups_cpuquota | default('80%') }}
-MemoryMax={{ pandora_cgroups_memorylimit | default('4G') }}
+MemoryMax={{ pandora_cgroups_memorylimit | default('2G') }}
 IOWeight={{ pandora_cgroups_ioweight | default('100') }}
 {% endif %}
 
