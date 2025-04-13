@@ -28,3 +28,4 @@
   changed_when: false
   when:
     - pandora_pypandora_tests_enable | bool
+    - not is_container
