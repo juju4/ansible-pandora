@@ -1,0 +1,30 @@
+---
+
+- name: Git clone pypandora repository
+  ansible.builtin.git:
+    repo: https://github.com/pandora-analysis/pypandora.git
+    dest: "{{ pandora_home }}/pypandora"
+    version: "{{ pandora_pypandora_version }}"
+    update: no
+    force: no
+
+- name: Install pypandora
+  ansible.builtin.command: poetry install
+  args:
+    chdir: "{{ pandora_home }}/pypandora"
+  environment:
+    PATH: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:{{ poetry_root }}/bin"
+    XDG_CONFIG_HOME: "{{ pandora_home }}/.config"
+  register: poetry_install
+  changed_when: "'No dependencies to install or update' not in poetry_install.stdout"
+
+- name: Run pypandora tests
+  ansible.builtin.command: poetry run pytest tests/test_web.py
+  args:
+    chdir: "{{ pandora_home }}/pypandora"
+  environment:
+    PATH: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:{{ poetry_root }}/bin"
+    XDG_CONFIG_HOME: "{{ pandora_home }}/.config"
+  changed_when: false
+  when:
+    - pandora_pypandora_tests_enable | bool

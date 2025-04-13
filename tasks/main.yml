@@ -155,3 +155,11 @@
     port: "{{ pandora_listen_port }}"
   when:
     - not is_container | bool
+
+- name: Import pypandora
+  ansible.builtin.import_tasks: pypandora.yml
+  become: yes
+  become_flags: -H
+  become_user: "{{ pandora_user }}"
+  when:
+    - pandora_pypandora_enable | bool

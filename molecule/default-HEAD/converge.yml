@@ -11,6 +11,7 @@
     pandora_poetry_install_version: HEAD
     pandora_poetry_version: ''
     pandora_poetry_hash: 'sha256:963d56703976ce9cdc6ff460c44a4f8fbad64c110dc447b86eeabb4a47ec2160'
+    pandora_pypandora_tests_enable: true
   pre_tasks:
     - name: Ubuntu | Install python3
       ansible.builtin.raw: test -e /usr/bin/python3 || (apt -y update && apt install -y python3-minimal)

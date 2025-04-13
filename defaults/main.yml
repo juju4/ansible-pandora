@@ -8,7 +8,7 @@ pandora_user: _pandora
 pandora_home: /var/_pandora
 pandora_root: "{{ pandora_home }}/pandora"
 poetry_root: /usr/local/share/poetry
-pandora_poetry_version: 1.8.4
+pandora_poetry_version: 2.1.2
 pandora_poetry_system_git: true
 pandora_kvrocks_version: dc4d53031abe9377dd91adf705ae2b2ca1b0b9e9  # 2.10.1
 pandora_valkey_version: 4fbab5740bfef66918d6c2950dd2b3b4e07815a2  # 8.0.1
@@ -155,5 +155,9 @@ pandora_proxy_port:
 
 pandora_ufw_allow_if_out: []
 pandora_ufw_out_custom_rules: []
+
+pandora_pypandora_enable: true
+pandora_pypandora_version: ac88bad1901dce70c40505ce0bba99af9c6415ec  # 1.9.3
+pandora_pypandora_tests_enable: false
 
 is_container: false

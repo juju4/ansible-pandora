@@ -9,6 +9,7 @@
   vars:
     # FIXME! try nonce instead of unsafe-inline
     hardenwebserver_header_csp: "default-src 'none'; script-src 'self' 'report-sample' 'unsafe-inline'; connect-src 'self'; img-src 'self' data: ; style-src 'self'; style-src-attr 'self' 'unsafe-inline'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests; report-uri /csp/report.php;"
+    pandora_pypandora_tests_enable: true
   pre_tasks:
     - name: Ubuntu | Install python3
       ansible.builtin.raw: test -e /usr/bin/python3 || (apt -y update && apt install -y python3-minimal)

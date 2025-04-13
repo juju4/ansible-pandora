@@ -155,6 +155,12 @@ jobs:
           curl -vL http://localhost:6100
         if: ${{ always() }}
         continue-on-error: true
+      - name: After script - pypandora
+        run: |
+          set -x
+          sudo -u _pandora bash -c 'cd /var/_pandora/pypandora && poetry run pytest tests/test_web.py'
+        if: ${{ always() }}
+        continue-on-error: true
       - name: After script - apparmor
         run: |
           set -x
