@@ -122,6 +122,8 @@
         XDG_CONFIG_HOME: "/var/_pandora/.config"
       changed_when: false
       register: poetrylist
+      become: yes
+      become_user: _pandora
     - name: Ensure some dependencies are present in poetry
       ansible.builtin.assert:
         that:
@@ -148,5 +150,32 @@
       ansible.builtin.assert:
         that: >
           "'pandora' in web.content"
+      when:
+        - not is_container|bool
+
+    - name: Get pandora-unoserver journalctl errors by grep
+      ansible.builtin.command:
+        cmd: journalctl -u pandora-unoserver -l --no-pager -g error -g 'Could not find a Java Runtime Environment'
+      changed_when: false
+      failed_when: false
+      register: errors
+    - name: Validate no errors
+      ansible.builtin.assert:
+        that:
+          - "'ERROR' not in errors.stdout"
+          - "'Could not find a Java Runtime Environment' not in errors.stdout"
+      when:
+        - not is_container|bool
+
+    - name: Get pandora-web journalctl errors by grep
+      ansible.builtin.command:
+        cmd: journalctl -u pandora-web -l --no-pager -g error
+      changed_when: false
+      failed_when: false
+      register: errors2
+    - name: Validate no errors
+      ansible.builtin.assert:
+        that:
+          - "'ERROR' not in errors2.stdout"
       when:
         - not is_container|bool
