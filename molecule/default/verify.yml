@@ -159,7 +159,7 @@
       changed_when: false
       failed_when: false
       register: errors
-    - name: Validate no errors
+    - name: Validate no errors pandora-unoserver
       ansible.builtin.assert:
         that:
           - "'ERROR' not in errors.stdout"
@@ -173,7 +173,7 @@
       changed_when: false
       failed_when: false
       register: errors2
-    - name: Validate no errors
+    - name: Validate no errors pandora-web
       ansible.builtin.assert:
         that:
           - "'ERROR' not in errors2.stdout"
