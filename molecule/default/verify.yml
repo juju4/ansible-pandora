@@ -40,7 +40,7 @@
         manager: auto
     - name: Validate that needed packages are present
       ansible.builtin.assert:
-        that: ansible_facts.packages['libreoffice-base-nogui']
+        that: ansible_facts.packages['libreoffice-base-nogui'] | length > 0
 
     - name: Check pandora start file
       ansible.builtin.stat:
@@ -90,7 +90,7 @@
       failed_when: false
     - name: Validate ps output
       ansible.builtin.assert:
-        that: ps3.stdout
+        that: ps3.stdout | length > 0
       when:
         - not is_container|bool
 
@@ -148,8 +148,8 @@
       failed_when: false
     - name: Validate localhost endpoint
       ansible.builtin.assert:
-        that: >
-          "'pandora' in web.content"
+        that:
+          - "'pandora' in web.content"
       when:
         - not is_container|bool
 

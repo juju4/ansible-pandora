@@ -212,7 +212,7 @@
 
 - name: Import disclaimer
   ansible.builtin.import_tasks: disclaimer.yml
-  when: pandora_disclaimer_header | string
+  when: pandora_disclaimer_header | length > 0
 
 - name: Import purge
   ansible.builtin.import_tasks: purge.yml

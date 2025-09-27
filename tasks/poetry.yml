@@ -24,7 +24,7 @@
   become_user: "{{ pandora_user }}"
 
 - name: Execute install-poetry.py
-  ansible.builtin.command: "python3 {{ install_archives }}/install-poetry.py{% if pandora_poetry_version | string %} --version {{ pandora_poetry_version }}{% endif %}"
+  ansible.builtin.command: "python3 {{ install_archives }}/install-poetry.py{% if pandora_poetry_version | length > 0 %} --version {{ pandora_poetry_version }}{% endif %}"
   environment:
     POETRY_HOME: "{{ poetry_root }}"
   become: yes
