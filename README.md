@@ -109,6 +109,10 @@ Normally fixed in upstream dulwich 0.20.46 but still seeing occurrence. As worka
 
 * If web UI does not react as expected, check browser console for possible Content-Security-Policy mismatch.
 
+## Alternatives
+
+* [Suspicious is a powerful web application designed to help users submit and analyze emails, files, IP addresses, and URLs](https://github.com/thalesgroup-cert/suspicious)
+
 ## License
 
 BSD 2-clause
