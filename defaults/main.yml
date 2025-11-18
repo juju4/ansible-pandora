@@ -1,7 +1,7 @@
 ---
 
 # renovate: datasource=github-releases depName=pandora-analysis/pandora
-pandora_version: 'v1.9.0'
+pandora_version: 'v1.10.0'
 pandora_poetry_install_version: fcd759d6feb9142736a19f8a753be975a120be87
 pandora_poetry_hash: 'sha256:66db5477a597b6176202ef77792076057ce50d2c5a2d2d2978c63e1f144d7b95'
 pandora_user: _pandora
@@ -158,7 +158,7 @@ pandora_ufw_out_custom_rules: []
 
 pandora_pypandora_enable: true
 # renovate: datasource=github-releases depName=pandora-analysis/pypandora
-pandora_pypandora_version: 'v1.9.3'
+pandora_pypandora_version: 'v1.9.4'
 pandora_pypandora_tests_enable: false
 
 is_container: false
