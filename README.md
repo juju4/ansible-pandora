@@ -112,6 +112,7 @@ Normally fixed in upstream dulwich 0.20.46 but still seeing occurrence. As worka
 ## Alternatives
 
 * [Suspicious is a powerful web application designed to help users submit and analyze emails, files, IP addresses, and URLs](https://github.com/thalesgroup-cert/suspicious)
+* [Dangerzone - Take potentially dangerous PDFs, office documents, or images and convert them to safe PDFs.](https://dangerzone.rocks/)
 
 ## License
 
