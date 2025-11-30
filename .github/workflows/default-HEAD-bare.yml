@@ -2,11 +2,14 @@
 name: default-HEAD-bare
 
 on:
-  push:
-  pull_request:
   workflow_dispatch:
-  schedule:  # run weekly, every Thursday 01:00
-    - cron: '40 1 * * 4'
+  schedule:
+    - cron: '40 2 11 * *'
+  merge_group:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref }}
+  cancel-in-progress: true
 
 permissions: {}
 
@@ -14,11 +17,11 @@ jobs:
   build:
     permissions:
       contents: read
-    runs-on: ubuntu-${{ matrix.version }}
+    runs-on: ${{ matrix.distribution }}-${{ matrix.version }}
     continue-on-error: ${{ matrix.experimental }}
     strategy:
       fail-fast: false
-      max-parallel: 4
+      max-parallel: 2
       matrix:
         include:
           - distribution: ubuntu
@@ -36,13 +39,22 @@ jobs:
       ANSIBLE_SUITE: ${{ matrix.suite }}
 
     steps:
-      - uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6
+      - name: Checkout code
+        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3  # v6.0.0
         with:
           path: ${{ env.ANSIBLE_ROLE }}
       - name: Set up Python
-        uses: actions/setup-python@83679a892e2d95755f2dac6acb0bfd1e9ac5d548 # v6
+        uses: actions/setup-python@83679a892e2d95755f2dac6acb0bfd1e9ac5d548  # v6.1.0
         with:
           python-version: '3.x'
+      - name: Cache
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830  # tag=v4.3.0
+        with:
+          path: |
+            /var/cache/apt/archives
+            /var/lib/apt
+            /var/_install
+          key: cache-ansible-pandora-${{ steps.get-date.outputs.date }}
       - name: Install dependencies
         run: |
           python3 -m pip install --upgrade pip
@@ -59,9 +71,17 @@ jobs:
       - name: Environment
         run: |
           set -x
+          ansible --version
+          ansible-config dump --only-changed -t all
+          ansible-galaxy collection list || true
+          ansible-galaxy role list || true
           pwd
           env
-          find -ls
+          find . -ls
+      - name: Galaxy dependencies
+        run: |
+          cd $GITHUB_WORKSPACE/$ANSIBLE_ROLE && ansible-galaxy install --timeout 120 --verbose -r molecule/$ANSIBLE_SUITE/requirements.yml
+        continue-on-error: true
       - name: run test
         run: |
           cd $GITHUB_WORKSPACE/$ANSIBLE_ROLE && ansible-playbook -i localhost, --connection=local --become -vvv molecule/$ANSIBLE_SUITE/converge.yml ${ANSIBLE_EXTRA_VARS}

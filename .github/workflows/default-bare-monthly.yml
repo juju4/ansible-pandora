@@ -1,12 +1,10 @@
 ---
-name: default-bare
+name: default-bare-monthly
 
 on:
-  push:
-  pull_request:
   workflow_dispatch:
-  schedule:  # run weekly, every Thursday 01:00
-    - cron: '40 1 * * 4'
+  schedule:  # run on the 11th of the month
+    - cron: '40 1 11 * *'
   merge_group:
 
 concurrency:
@@ -23,11 +21,15 @@ jobs:
     continue-on-error: ${{ matrix.experimental }}
     strategy:
       fail-fast: false
-      max-parallel: 4
+      max-parallel: 2
       matrix:
         include:
           - distribution: ubuntu
             version: '24.04'
+            suite: default
+            experimental: false
+          - distribution: ubuntu
+            version: '22.04'
             suite: default
             experimental: false
     env:
@@ -42,7 +44,7 @@ jobs:
         with:
           path: ${{ env.ANSIBLE_ROLE }}
       - name: Set up Python
-        uses: actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c  # tag=v6.0.0
+        uses: actions/setup-python@83679a892e2d95755f2dac6acb0bfd1e9ac5d548  # v6.1.0
         with:
           python-version: '3.x'
       - name: Cache
