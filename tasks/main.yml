@@ -1,8 +1,8 @@
 ---
 
 - name: Include version-specific variables for Ubuntu.
-  ansible.builtin.include_vars: "{{ ansible_distribution }}-{{ ansible_distribution_version }}.yml"
-  when: ansible_distribution == 'Ubuntu'
+  ansible.builtin.include_vars: "{{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_version'] }}.yml"
+  when: ansible_facts['distribution'] == 'Ubuntu'
 - name: Include poetry v1.x variables
   ansible.builtin.include_vars: poetry1.yml
   when:
@@ -20,10 +20,10 @@
   ansible.builtin.set_fact:
     is_container: true
   when: >
-    (ansible_virtualization_type is defined and
-      (ansible_virtualization_type == "docker"
-       or ansible_virtualization_type == "containerd"
-       or ansible_virtualization_type == "container"
+    (ansible_facts['virtualization_type'] is defined and
+      (ansible_facts['virtualization_type'] == "docker"
+       or ansible_facts['virtualization_type'] == "containerd"
+       or ansible_facts['virtualization_type'] == "container"
       )
     )
 
@@ -41,7 +41,7 @@
     cache_valid_time: "{{ pandora_apt_cache_valid_time | default('3600') }}"
   become: yes
   become_user: root
-  when: ansible_os_family == 'Debian'
+  when: ansible_facts['os_family'] == 'Debian'
 
 - name: Ensure dependencies packages are present
   ansible.builtin.package:
