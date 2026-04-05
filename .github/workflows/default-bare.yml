@@ -43,6 +43,7 @@ jobs:
           egress-policy: block
           allowed-endpoints: >
             azure.archive.ubuntu.com:80
+            database.clamav.net:443
             esm.ubuntu.com:443
             files.pythonhosted.org:443
             galaxy.ansible.com:443
@@ -50,6 +51,7 @@ jobs:
             packages.microsoft.com:443
             pypi.org:443
             www.google.com:1025
+            raw.githubusercontent.com:443
       - name: Checkout code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
         with:
