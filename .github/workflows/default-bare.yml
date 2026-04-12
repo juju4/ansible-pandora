@@ -44,6 +44,7 @@ jobs:
           allowed-endpoints: >
             azure.archive.ubuntu.com:80
             cdn.datatables.net:443
+            cdn.download.comodo.com:443
             cdnjs.cloudflare.com:443
             code.jquery.com:443
             database.clamav.net:443
