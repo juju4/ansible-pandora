@@ -48,6 +48,7 @@ jobs:
             cdnjs.cloudflare.com:443
             code.jquery.com:443
             database.clamav.net:443
+            dl.google.com:443
             download.comodo.com:443
             esm.ubuntu.com:443
             files.pythonhosted.org:443
