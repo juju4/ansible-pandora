@@ -31,7 +31,7 @@
 
 - name: Build kvrocks
   ansible.builtin.command:
-    cmd: cpulimit -l 50 python3 ./x.py build -DENABLE_OPENSSL=ON
+    cmd: cpulimit -l 50 -- python3 ./x.py build -DENABLE_OPENSSL=ON
   args:
     chdir: "{{ pandora_home }}/kvrocks"
     creates: "{{ pandora_home }}/kvrocks/build/kvrocks"
