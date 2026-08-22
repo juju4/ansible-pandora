@@ -47,6 +47,7 @@ pandora_pkgs:
   # AV workers
   - clamav-daemon
   - cron
+  - cpulimit
 
 ufw_rulename_ssh: OpenSSH
 pandora_python_v: 3.12
