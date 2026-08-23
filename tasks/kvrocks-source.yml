@@ -37,4 +37,3 @@
     creates: "{{ pandora_home }}/kvrocks/build/kvrocks"
   become: yes
   become_user: "{{ pandora_user }}"
-  throttle: 1
