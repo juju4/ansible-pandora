@@ -156,6 +156,12 @@
   when:
     - not is_container | bool
 
+- name: Check if kvrocks port is listening
+  ansible.builtin.wait_for:
+    port: 6101
+  when:
+    - not is_container | bool
+
 - name: Import pypandora
   ansible.builtin.import_tasks: pypandora.yml
   become: yes
