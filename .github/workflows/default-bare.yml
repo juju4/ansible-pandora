@@ -50,6 +50,7 @@ jobs:
             database.clamav.net:443
             dl.google.com:443
             download.comodo.com:443
+            download.docker.com:443
             esm.ubuntu.com:443
             files.pythonhosted.org:443
             galaxy.ansible.com:443
