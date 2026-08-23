@@ -103,6 +103,8 @@
   ansible.builtin.import_tasks: redis-source.yml
 - name: Import kvrocks-source
   ansible.builtin.import_tasks: kvrocks-source.yml
+  when:
+    - pandora_kvrocks_type == 'source'
 
 - name: Import pandora
   ansible.builtin.import_tasks: pandora.yml

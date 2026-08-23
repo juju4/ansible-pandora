@@ -1,9 +1,6 @@
 ---
 
 roles:
-  - src: https://github.com/juju4/ansible-kvrocks/
-    version: main
-    name: juju4.kvrocks
   - src: https://github.com/geerlingguy/ansible-role-redis/
     version: master
     name: geerlingguy.redis
@@ -23,3 +20,4 @@ roles:
     version: main
     name: juju4.harden_nginx
   - name: geerlingguy.java
+  - name: geerlingguy.docker
