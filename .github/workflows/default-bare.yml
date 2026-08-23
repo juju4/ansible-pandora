@@ -175,6 +175,7 @@ jobs:
           sudo cat /var/_pandora/pandora/storage/kvrocks.conf || true
           sudo ls -la /var/_pandora/kvrocks/build || true
           sudo /var/_pandora/kvrocks/build/kvrocks -h || true
+          sudo find /var/_pandora/kbrocks/ -type f -executable -ls
         if: ${{ always() }}
         continue-on-error: true
       - name: After script - logs
