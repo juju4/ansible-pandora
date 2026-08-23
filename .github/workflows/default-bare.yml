@@ -157,11 +157,24 @@ jobs:
         run: |
           set -x
           sudo ls -la /var/_pandora/
-          sudo ls -la /var/_pandora/kvrocks
-          sudo ls -la /var/_pandora/valkey || true
           sudo ls -la /var/_pandora/pandora
           sudo cat /var/_pandora/pandora/config/generic.json
-          sudo ls -la /var/_pandora/kvrocks/src/kvrocks /var/_pandora/valkey/src/valkey-server || true
+        if: ${{ always() }}
+        continue-on-error: true
+      - name: After script - valkey
+        run: |
+          set -x
+          sudo ls -la /var/_pandora/valkey || true
+          sudo ls -la /var/_pandora/valkey/src/valkey-server || true
+        if: ${{ always() }}
+        continue-on-error: true
+      - name: After script - kvrocks
+        run: |
+          set -x
+          sudo ls -la /var/_pandora/kvrocks
+          sudo cat /var/_pandora/pandora/storage/kvrocks.conf || true
+          sudo ls -la /var/_pandora/kvrocks/build || true
+          sudo /var/_pandora/kvrocks/build/kvrocks -h || true
         if: ${{ always() }}
         continue-on-error: true
       - name: After script - logs
