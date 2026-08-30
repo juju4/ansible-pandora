@@ -155,48 +155,6 @@
   register: dl_result
   until: dl_result is success
 
-- name: Download dropzone dist
-  ansible.builtin.get_url:
-    url: "https://github.com/dropzone/dropzone/releases/download/{{ pandora_dropzone_version }}/dist.zip"
-    dest: "{{ pandora_home }}/dropzone-dist.zip"
-    mode: '0600'
-    checksum: "{{ pandora_dropzone_checksum }}"
-  register: dl_result
-  until: dl_result is success
-
-- name: Unarchive dropzone dist
-  ansible.builtin.unarchive:
-    src: "{{ pandora_home }}/dropzone-dist.zip"
-    dest: "{{ pandora_home }}"
-    mode: '0700'
-    remote_src: true
-
-- name: Download moment dist
-  ansible.builtin.get_url:
-    url: "https://github.com/moment/moment/archive/refs/tags/{{ pandora_moment_version }}.tar.gz"
-    dest: "{{ pandora_home }}/moment.tar.gz"
-    mode: '0600'
-    checksum: "{{ pandora_moment_checksum }}"
-
-- name: Unarchive moment dist
-  ansible.builtin.unarchive:
-    src: "{{ pandora_home }}/moment.tar.gz"
-    dest: "{{ pandora_home }}"
-    mode: '0700'
-    remote_src: true
-
-- name: Set dropzone and moment files in web root
-  ansible.builtin.copy:
-    src: "{{ pandora_home }}/{{ item.s }}"
-    dest: "{{ pandora_root }}/website/web/static/{{ item.d }}"
-    mode: '0644'
-    remote_src: yes
-    backup: "{{ pandora_backup }}"
-  loop:
-    - { s: dist/dropzone-min.js, d: js/lib/dropzone-min.js }
-    - { s: dist/dropzone.css, d: css/lib/dropzone.css }
-    - { s: "moment-{{ pandora_moment_version }}/min/moment-with-locales.min.js", d: js/lib/moment-with-locales.min.js }
-
 - name: Ensure mail.json is configured for imap fetcher
   ansible.builtin.template:
     src: mail.json.j2
