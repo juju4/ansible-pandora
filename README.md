@@ -108,6 +108,13 @@ Normally fixed in upstream dulwich 0.20.46 but still seeing occurrence. As worka
 * Memory can easily be an issue and result in oom-kill some process. Recommend at least 6GB of RAM.
 
 * If web UI does not react as expected, check browser console for possible Content-Security-Policy mismatch.
+To reinstall web static dependencies
+```shell
+sudo -u _pandora -s
+cd ~/pandora/tools
+/usr/local/share/poetry/bin/poetry run python 3rdparty.py
+/usr/local/share/poetry/bin/poetry run python generate_sri.py
+```
 
 ## Alternatives
 
