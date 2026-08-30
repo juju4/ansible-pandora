@@ -105,6 +105,12 @@
   ansible.builtin.import_tasks: kvrocks-source.yml
   when:
     - pandora_kvrocks_type == 'source'
+- name: Kvrocks from deb
+  ansible.builtin.apt:
+    deb: "{{ pandora_kvrocks_deb_url }}"
+    state: present
+  when:
+    - pandora_kvrocks_type == 'deb'
 
 - name: Import pandora
   ansible.builtin.import_tasks: pandora.yml

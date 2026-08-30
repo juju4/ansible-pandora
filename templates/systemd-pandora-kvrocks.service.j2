@@ -9,7 +9,11 @@ Requires=network.target
 
 [Service]
 Type=simple
+{% if pandora_kvrocks_type == 'deb' %}
+ExecStart=/usr/bin/kvrocks -c {{ pandora_root }}/storage/kvrocks.conf
+{% else %}
 ExecStart={{ pandora_home }}/kvrocks/build/kvrocks -c {{ pandora_root }}/storage/kvrocks.conf
+{% endif %}
 WorkingDirectory={{ pandora_root }}/bin
 Restart=on-failure
 RestartSec=15

@@ -11,7 +11,8 @@ poetry_root: /usr/local/share/poetry
 # renovate: datasource=github-releases depName=python-poetry/poetry
 pandora_poetry_version: 2.1.2
 pandora_poetry_system_git: true
-pandora_kvrocks_type: 'docker'
+pandora_kvrocks_type: 'deb'
+pandora_kvrocks_deb_url: https://github.com/RocksLabs/kvrocks-fpm/releases/download/2.16.0-1/kvrocks_2.16.0-1_amd64.deb
 # pandora_kvrocks_type: 'source'
 pandora_kvrocks_version: dc4d53031abe9377dd91adf705ae2b2ca1b0b9e9  # 2.10.1
 pandora_valkey_version: 4fbab5740bfef66918d6c2950dd2b3b4e07815a2  # 8.0.1
