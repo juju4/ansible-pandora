@@ -26,6 +26,7 @@
     PATH: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:{{ poetry_root }}/bin"
     XDG_CONFIG_HOME: "{{ pandora_home }}/.config"
   changed_when: false
+  failed_when: "{{ pandora_pypandora_tests_failed_when | default(omit) }}"
   when:
     - pandora_pypandora_tests_enable | bool
     - not is_container
