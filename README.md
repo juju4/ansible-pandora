@@ -1,7 +1,7 @@
+# pandora ansible role
+
 [![Actions Status - Main](https://github.com/juju4/ansible-pandora/workflows/AnsibleCI/badge.svg)](https://github.com/juju4/ansible-pandora/actions?query=branch%3Amain)
 [![Actions Status - Devel](https://github.com/juju4/ansible-pandora/workflows/AnsibleCI/badge.svg?branch=devel)](https://github.com/juju4/ansible-pandora/actions?query=branch%3Adevel)
-
-# pandora ansible role
 
 Setup pandora server, an analysis framework to discover if a file is suspicious and conveniently show the results.
 * https://github.com/pandora-analysis/pandora
