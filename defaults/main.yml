@@ -118,6 +118,25 @@ pandora_web_static:
       d: 'js/lib/datatables.js',
       c: 'sha256:c4073041354438015a495b9e95b41e1fc3119778a15d7903f3bb07e37b5daca2'
   }
+pandora_workers_yml:
+  - base.yml
+  - extractor.yml
+  - joesandbox.yml
+  - observables.yml
+  - xmldeobfuscator.yml
+  - blocklists.yml
+  - hashlookup.yml
+  - malwarebazaar.yml
+  - ole.yml
+  - yara.yml
+  - clamav.yml
+  - hybridanalysis.yml
+  - msodde.yml
+  - preview.yml
+  - yara_signature_base.yml
+  - comodo.yml
+  - mwdb.yml
+  - virustotal.yml
 
 install_archives: /var/_install
 # needed ansible Unprivileged become user

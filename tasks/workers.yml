@@ -7,22 +7,4 @@
     mode: '0644'
     force: no
     remote_src: yes
-  loop:
-    - base.yml
-    - extractor.yml
-    - joesandbox.yml
-    - observables.yml
-    - xmldeobfuscator.yml
-    - blocklists.yml
-    - hashlookup.yml
-    - malwarebazaar.yml
-    - ole.yml
-    - yara.yml
-    - clamav.yml
-    - hybridanalysis.yml
-    - msodde.yml
-    - preview.yml
-    - yara_signature_base.yml
-    - comodo.yml
-    - mwdb.yml
-    - virustotal.yml
+  loop: "{{ pandora_workers_yml }}"

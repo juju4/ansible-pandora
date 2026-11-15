@@ -12,6 +12,24 @@
     pandora_poetry_version: ''
     pandora_poetry_hash: 'sha256:75745ca71373a7b22fa150953543f03d826a52f8e4bc4350328a33bddd668026'
     pandora_pypandora_tests_enable: true
+    pandora_workers_yml:
+      - base.yml
+      - extractor.yml
+      - joesandbox.yml
+      - observables.yml
+      - blocklists.yml
+      - hashlookup.yml
+      - malwarebazaar.yml
+      - ole.yml
+      - yara.yml
+      - clamav.yml
+      - hybridanalysis.yml
+      - msodde.yml
+      - preview.yml
+      - yara_signature_base.yml
+      - comodo.yml
+      - mwdb.yml
+      - virustotal.yml
   pre_tasks:
     - name: Ubuntu | Install python3
       ansible.builtin.raw: test -e /usr/bin/python3 || (apt -y update && apt install -y python3-minimal)
