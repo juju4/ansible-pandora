@@ -1,0 +1,53 @@
+---
+
+pandora_pkgs:
+  - git
+  - python3
+  - apparmor-utils
+  - acl
+  - unzip
+  - pkg-config
+  # for compiling things
+  - python3-dev
+  - python3-venv
+  # For HTML -> PDF
+  - libpango-1.0-0
+  - libharfbuzz0b
+  - libpangoft2-1.0-0
+  # For Office -> PDF
+  - libreoffice-base-nogui
+  - libreoffice-calc-nogui
+  - libreoffice-draw-nogui
+  - libreoffice-impress-nogui
+  - libreoffice-math-nogui
+  - libreoffice-writer-nogui
+  # for extracting exif information
+  - exiftool
+  # for extracting rar files
+  - unrar
+  # for textract
+  - libxml2-dev
+  - libxslt1-dev
+  - antiword
+  - unrtf
+  - poppler-utils
+  - tesseract-ocr
+  - flac
+  - ffmpeg
+  - lame
+  - libmad0
+  - libsox-fmt-mp3
+  - sox
+  - libjpeg-dev
+  - swig
+  # seems required for yara-python
+  - libssl-dev
+  # Required by reportlab
+  - libcairo2-dev
+  # AV workers
+  - clamav-daemon
+  - cron
+  - uidmap
+
+ufw_rulename_ssh: OpenSSH
+pandora_python_v: 3.14
